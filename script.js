@@ -69,8 +69,26 @@ function submitPost() {
         return;
     }
 
-    // 데모 버전 메시지
-    alert(`[시스템 알림] \n'${author}' 님의 게시글 "${title}"이(가) 성공적으로 임시 등록되었습니다. \n(포트폴리오 데모 버전은 실제 DB와 연동되지 않습니다.)`);
+    // 테이블에 새 글을 화면 상에 추가 (새로고침 전까지는 유지됨)
+    const boardList = document.getElementById('board-list');
+    const rowCount = boardList.getElementsByTagName('tr').length + 1;
+    
+    // 현재 날짜 구하기
+    const today = new Date();
+    const dateStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+    
+    // 새 행(tr) 생성 및 내용 삽입
+    const newRow = document.createElement('tr');
+    newRow.innerHTML = `
+        <td>${rowCount}</td>
+        <td>${title}</td>
+        <td>${author}</td>
+        <td>${dateStr}</td>
+    `;
+    boardList.prepend(newRow); // 맨 위에 추가
+
+    // 알림 메시지
+    alert(`[시스템 알림] \n'${author}' 님의 게시글 "${title}"이(가) 등록되었습니다. \n(현재 데이터베이스가 연결되어 있지 않아 화면에만 임시 표시되며, 새로고침 시 초기화됩니다.)`);
     
     // 입력 폼 초기화 및 숨기기
     document.getElementById('title').value = '';

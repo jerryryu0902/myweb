@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>Contact - 류재정 포트폴리오</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <nav>
+        <a href="index.html" class="logo">RYU JAE JEONG</a>
+        <ul class="nav-links">
+            <li><a href="index.html">Home</a></li>
+            <li><a href="projects.html">Projects</a></li>
+            <li><a href="class.html">Class</a></li>
+            <li><a href="history.html">History</a></li>
+            <li><a href="board.html">Board</a></li>
+            <li><a href="contact.html">Contact</a></li>
+        </ul>
+    </nav>
+
+    <section>
+        <header class="section-header reveal">
+            <span class="step-label">Get In Touch</span>
+            <h2>Contact Me</h2>
+            <p class="sub-text" style="text-align: center;">포트폴리오에 대해 궁금한 점이나 입사 제한 등이 있으시면 아래 폼을 통해 메시지를 남겨주세요.<br>작성된 메시지는 제 이메일로 즉시 전송됩니다.</p>
+        </header>
+
+        <div class="card reveal" style="max-width: 600px; margin: 0 auto; display: block;">
+            <form action="https://formsubmit.co/jerryryu0902@dongyang.ac.kr" method="POST" class="contact-form">
+                <!-- 자동 응답 이메일 제목 설정 -->
+                <input type="hidden" name="_subject" value="[포트폴리오 웹사이트 문의] 새로운 메시지가 도착했습니다!">
+                
+                <div class="form-group">
+                    <input type="text" name="name" placeholder="보내시는 분 이름 (Name)" class="input-field" required>
+                    <input type="email" name="email" placeholder="답장 받으실 이메일 주소 (Email)" class="input-field" required>
+                    <textarea name="message" placeholder="전달하실 메시지를 입력해 주세요 (Message)" class="input-field" rows="8" required></textarea>
+                    <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 1rem;">담당자(류재정)에게 메일 전송하기</button>
+                    <!-- Formsubmit의 성공 후 돌아갈 페이지 설정 (선택적) -->
+                    <input type="hidden" name="_next" value="https://example.com/thanks.html">
+                </div>
+            </form>
+        </div>
+    </section>
+
+    <script src="script.js"></script>
+</body>
+</html>
