@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>프로젝트 성과 - 류재정 포트폴리오</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <nav>
+        <a href="index.html" class="logo">RYU JAE JEONG</a>
+        <ul class="nav-links">
+            <li><a href="index.html">Home</a></li>
+            <li><a href="projects.html">Projects</a></li>
+            <li><a href="class.html">Class</a></li>
+            <li><a href="history.html">History</a></li>
+            <li><a href="board.html">Board</a></li>
+        </ul>
+    </nav>
+
+    <section class="project-section">
+        <header class="section-header reveal">
+            <span class="step-label">Capstone Design Case Study</span>
+            <h2>반도체 웨이퍼 이송 로봇 최적화</h2>
+        </header>
+        
+        <div class="project-detail reveal">
+            <div class="project-content">
+                <h3>Technical Benchmark</h3>
+                <p class="sub-text">예선 데이터 기반의 문제 진단 및 본선 알고리즘 고도화 결과입니다.</p>
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>분석 항목</th>
+                            <th>예선 단계 (우진조 기준)</th>
+                            <th>최적화 단계 (가을맞이팀 본선)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>주행 효율</td>
+                            <td>완주 39초 기록</td>
+                            <td>불필요한 대기 제거, 딜레이 최적화</td>
+                        </tr>
+                        <tr>
+                            <td>인식 로직</td>
+                            <td>양쪽 웨이퍼 동시 인식</td>
+                            <td>왼쪽 웨이퍼 집중 인식 (시간 단축)</td>
+                        </tr>
+                        <tr>
+                            <td>모션 제어</td>
+                            <td>시작/정지 시 '툭툭' 끊김 현상</td>
+                            <td>PID 제어 기반 부드러운 가감속</td>
+                        </tr>
+                        <tr>
+                            <td>정밀도</td>
+                            <td>도착 지점 관성 오차 발생</td>
+                            <td>정확한 지점 정지 로직 구현</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="project-visual">
+                <div class="card floating-slow">
+                    <div class="img-placeholder">
+                        <p><strong>설계 변천사</strong></p>
+                        <p class="caption">마분지 프로토타이핑 → 5mm 고강도 아크릴 정밀 가공</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="grid-3 reveal">
+            <div class="card">
+                <div class="icon">⚙️</div>
+                <h3>PID 알고리즘 고도화</h3>
+                <p>주행 시작과 끝에서 발생하는 물리적 충격(stuttering)을 해결하기 위해 PID 파라미터를 튜닝하여 안정적인 이송 시스템을 구축했습니다.</p>
+            </div>
+            <div class="card">
+                <div class="icon">⚡</div>
+                <h3>전력 및 구동 최적화</h3>
+                <p>웨이퍼 파지 시 전력 분산으로 인한 모터 출력 저하를 방지하기 위해 기어비를 하향 조정하고 모터 토크를 재설계했습니다.</p>
+            </div>
+            <div class="card">
+                <div class="icon">🔍</div>
+                <h3>센서 노이즈 필터링</h3>
+                <p>초음파 센서의 인식 오류를 해결하기 위해 하드웨어 배선을 전면 수정하고, 소프트웨어적으로 디바운싱 로직을 강화했습니다.</p>
+            </div>
+        </div>
+    </section>
+
+    <script src="script.js"></script>
+</body>
+</html>

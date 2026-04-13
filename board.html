@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>네트워크 게시판 - 류재정 포트폴리오</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <nav>
+        <a href="index.html" class="logo">RYU JAE JEONG</a>
+        <ul class="nav-links">
+            <li><a href="index.html">Home</a></li>
+            <li><a href="projects.html">Projects</a></li>
+            <li><a href="class.html">Class</a></li>
+            <li><a href="history.html">History</a></li>
+            <li><a href="board.html">Board</a></li>
+        </ul>
+    </nav>
+
+    <section>
+        <header class="section-header reveal">
+            <span class="step-label">Guest Interaction</span>
+            <h2>자유게시판</h2>
+        </header>
+
+        <div class="card reveal">
+            <table class="board-table">
+                <thead>
+                    <tr>
+                        <th>번호</th>
+                        <th>제목</th>
+                        <th>작성자</th>
+                        <th>날짜</th>
+                    </tr>
+                </thead>
+                <tbody id="board-list">
+                    <tr>
+                        <td>1</td>
+                        <td>반도체 이송 로봇의 PID 튜닝 값이 궁금합니다.</td>
+                        <td>로봇공학자</td>
+                        <td>2024-05-15</td>
+                    </tr>
+                    <tr>
+                        <td>2</td>
+                        <td>아크릴 프레임 설계가 매우 정교하네요.</td>
+                        <td>설계전문가</td>
+                        <td>2024-05-18</td>
+                    </tr>
+                </tbody>
+            </table>
+            <div class="board-actions">
+                <button class="btn btn-primary" onclick="toggleForm()">글쓰기</button>
+            </div>
+        </div>
+
+        <div id="write-form" class="card write-card reveal" style="display: none;">
+            <h3>새 게시글 작성</h3>
+            <div class="form-group">
+                <input type="text" id="title" placeholder="제목을 입력하세요" class="input-field">
+                <input type="text" id="author" placeholder="작성자 명" class="input-field">
+                <textarea id="content" placeholder="내용을 입력하세요" class="input-field" rows="5"></textarea>
+                <div class="form-footer">
+                    <input type="password" id="pwd" placeholder="비밀번호" class="input-field">
+                    <button class="btn btn-primary" onclick="submitPost()">등록하기</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <script src="script.js"></script>
+</body>
+</html>
