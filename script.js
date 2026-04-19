@@ -1,15 +1,16 @@
 /**
- * 류재정 로봇 자동화 포트폴리오 - 인터랙티브 엔진
+ * 류재정 로봇 자동화 포트폴리오 - 인터랙티브 엔진 (LocalStorage 통합 버전)
  */
 
 document.addEventListener('DOMContentLoaded', () => {
     initRevealAnimation();
     initAntiGravityControl();
-    initBoardForm();
+    // 페이지 로드 시 저장된 게시글 불러오기
+    loadPosts(); 
 });
 
 /**
- * 스크롤 감지에 따른 요소 등장 효과 (Intersection Observer)
+ * 1. 스크롤 애니메이션 (기존 기능 유지)
  */
 function initRevealAnimation() {
     const observerOptions = {
@@ -29,70 +30,102 @@ function initRevealAnimation() {
 }
 
 /**
- * 마우스 상호작용에 따른 부유 효과 제어
+ * 2. 마우스 상호작용 부유 효과 (기존 기능 유지)
  */
 function initAntiGravityControl() {
     const floatTarget = document.querySelector('.anti-gravity-wrapper');
-    
     if (floatTarget) {
         floatTarget.addEventListener('mouseenter', () => {
-            // 마우스 호버 시 엔진 출력 증가 (속도 상승)
             floatTarget.style.animationDuration = '2s';
         });
-
         floatTarget.addEventListener('mouseleave', () => {
-            // 마우스 이탈 시 안정 모드 복귀
             floatTarget.style.animationDuration = '6s';
         });
     }
 }
 
 /**
- * 게시판 UI 제어 로직
+ * 3. 게시판 기능 (LocalStorage 연동)
  */
+
+// 글쓰기 폼 토글
 function toggleForm() {
     const form = document.getElementById('write-form');
+    if (!form) return;
     const isHidden = form.style.display === 'none';
-    
     form.style.display = isHidden ? 'block' : 'none';
     if (isHidden) {
         form.scrollIntoView({ behavior: 'smooth' });
     }
 }
 
+// 게시글 저장
 function submitPost() {
-    const title = document.getElementById('title').value;
-    const author = document.getElementById('author').value;
+    const titleEl = document.getElementById('title');
+    const authorEl = document.getElementById('author');
+    const contentEl = document.getElementById('content');
 
-    if (!title || !author) {
+    if (!titleEl.value || !authorEl.value) {
         alert('제목과 작성자 정보를 모두 입력해 주세요.');
         return;
     }
 
-    // 테이블에 새 글을 화면 상에 추가 (새로고침 전까지는 유지됨)
-    const boardList = document.getElementById('board-list');
-    const rowCount = boardList.getElementsByTagName('tr').length + 1;
-    
-    // 현재 날짜 구하기
     const today = new Date();
     const dateStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
     
-    // 새 행(tr) 생성 및 내용 삽입
-    const newRow = document.createElement('tr');
-    newRow.innerHTML = `
-        <td>${rowCount}</td>
-        <td>${title}</td>
-        <td>${author}</td>
-        <td>${dateStr}</td>
-    `;
-    boardList.prepend(newRow); // 맨 위에 추가
+    const newPost = {
+        id: Date.now(),
+        title: titleEl.value,
+        author: authorEl.value,
+        content: contentEl.value,
+        date: dateStr
+    };
 
-    // 알림 메시지
-    alert(`[시스템 알림] \n'${author}' 님의 게시글 "${title}"이(가) 등록되었습니다. \n(현재 데이터베이스가 연결되어 있지 않아 화면에만 임시 표시되며, 새로고침 시 초기화됩니다.)`);
+    // 로컬 스토리지 데이터 처리
+    const posts = JSON.parse(localStorage.getItem('boardPosts')) || [];
+    posts.unshift(newPost);
+    localStorage.setItem('boardPosts', JSON.stringify(posts));
+
+    alert(`[시스템] '${authorEl.value}' 님의 게시글이 등록되었습니다.`);
     
-    // 입력 폼 초기화 및 숨기기
-    document.getElementById('title').value = '';
-    document.getElementById('author').value = '';
-    document.getElementById('content').value = '';
+    // 초기화
+    titleEl.value = '';
+    authorEl.value = '';
+    contentEl.value = '';
     toggleForm();
+    loadPosts();
+}
+
+// 게시글 목록 불러오기
+function loadPosts() {
+    const boardList = document.getElementById('board-list');
+    if (!boardList) return;
+
+    const posts = JSON.parse(localStorage.getItem('boardPosts')) || [];
+    boardList.innerHTML = '';
+
+    if (posts.length === 0) {
+        boardList.innerHTML = '<tr><td colspan="4" style="text-align:center; padding:20px;">등록된 게시글이 없습니다.</td></tr>';
+        return;
+    }
+
+    posts.forEach((post, index) => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+            <td>${posts.length - index}</td>
+            <td style="cursor:pointer; color:#3498db; font-weight:bold;" onclick="viewPost(${post.id})">${post.title}</td>
+            <td>${post.author}</td>
+            <td>${post.date}</td>
+        `;
+        boardList.appendChild(row);
+    });
+}
+
+// 게시글 상세 보기
+function viewPost(postId) {
+    const posts = JSON.parse(localStorage.getItem('boardPosts')) || [];
+    const post = posts.find(p => p.id === postId);
+    if (post) {
+        alert(`제목: ${post.title}\n작성자: ${post.author}\n날짜: ${post.date}\n\n내용:\n${post.content}`);
+    }
 }
