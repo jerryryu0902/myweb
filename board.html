@@ -2,6 +2,7 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>네트워크 게시판 - 류재정 포트폴리오</title>
     <link rel="stylesheet" href="style.css">
 </head>
@@ -22,6 +23,7 @@
         <header class="section-header reveal">
             <span class="step-label">Guest Interaction</span>
             <h2>자유게시판</h2>
+            <p>전 세계 어디서든 실시간으로 의견을 남길 수 있는 Firebase 연동 게시판입니다.</p>
         </header>
 
         <div class="card reveal">
@@ -36,16 +38,7 @@
                 </thead>
                 <tbody id="board-list">
                     <tr>
-                        <td>1</td>
-                        <td>반도체 이송 로봇의 PID 튜닝 값이 궁금합니다.</td>
-                        <td>로봇공학자</td>
-                        <td>2024-05-15</td>
-                    </tr>
-                    <tr>
-                        <td>2</td>
-                        <td>아크릴 프레임 설계가 매우 정교하네요.</td>
-                        <td>설계전문가</td>
-                        <td>2024-05-18</td>
+                        <td colspan="4" style="text-align:center; padding:20px;">데이터를 불러오는 중입니다...</td>
                     </tr>
                 </tbody>
             </table>
@@ -61,13 +54,13 @@
                 <input type="text" id="author" placeholder="작성자 명" class="input-field">
                 <textarea id="content" placeholder="내용을 입력하세요" class="input-field" rows="5"></textarea>
                 <div class="form-footer">
-                    <input type="password" id="pwd" placeholder="비밀번호" class="input-field">
                     <button class="btn btn-primary" onclick="submitPost()">등록하기</button>
+                    <button class="btn" style="background:#ccc;" onclick="toggleForm()">취소</button>
                 </div>
             </div>
         </div>
     </section>
 
-    <script src="script.js"></script>
+    <script type="module" src="script.js"></script>
 </body>
 </html>
