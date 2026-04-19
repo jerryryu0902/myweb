@@ -23,44 +23,82 @@
         <header class="section-header reveal">
             <span class="step-label">Guest Interaction</span>
             <h2>자유게시판</h2>
-            <p>전 세계 어디서든 실시간으로 의견을 남길 수 있는 Firebase 연동 게시판입니다.</p>
+            <p class="sub-text" style="text-align:center;">
+                Firebase Realtime Database 기반 온라인 게시판입니다.<br>
+                글쓰기, 상세보기, 댓글, 좋아요, 비밀번호 삭제 기능을 사용할 수 있습니다.
+            </p>
         </header>
 
         <div class="card reveal">
             <table class="board-table">
                 <thead>
                     <tr>
-                        <th>번호</th>
+                        <th style="width: 80px;">번호</th>
                         <th>제목</th>
-                        <th>작성자</th>
-                        <th>날짜</th>
+                        <th style="width: 140px;">작성자</th>
+                        <th style="width: 140px;">날짜</th>
+                        <th style="width: 100px;">좋아요</th>
                     </tr>
                 </thead>
                 <tbody id="board-list">
                     <tr>
-                        <td colspan="4" style="text-align:center; padding:20px;">데이터를 불러오는 중입니다...</td>
+                        <td colspan="5" style="text-align:center; padding:20px;">
+                            데이터를 불러오는 중입니다...
+                        </td>
                     </tr>
                 </tbody>
             </table>
-            <div class="board-actions">
-                <button class="btn btn-primary" onclick="toggleForm()">글쓰기</button>
+
+            <div class="board-actions" style="margin-top: 1.5rem; display:flex; gap: 0.75rem; flex-wrap: wrap;">
+                <button class="btn btn-primary" type="button" onclick="toggleForm()">글쓰기</button>
+                <button class="btn btn-secondary" type="button" onclick="loadPosts()">새로고침</button>
             </div>
         </div>
 
-        <div id="write-form" class="card write-card reveal" style="display: none;">
-            <h3>새 게시글 작성</h3>
+        <div id="write-form" class="card write-card reveal" style="display:none; margin-top: 2rem;">
+            <h3 style="margin-bottom: 1rem;">새 게시글 작성</h3>
             <div class="form-group">
                 <input type="text" id="title" placeholder="제목을 입력하세요" class="input-field">
                 <input type="text" id="author" placeholder="작성자 명" class="input-field">
-                <textarea id="content" placeholder="내용을 입력하세요" class="input-field" rows="5"></textarea>
-                <div class="form-footer">
-                    <button class="btn btn-primary" onclick="submitPost()">등록하기</button>
-                    <button class="btn" style="background:#ccc;" onclick="toggleForm()">취소</button>
+                <textarea id="content" placeholder="내용을 입력하세요" class="input-field" rows="6"></textarea>
+                <input type="password" id="pwd" placeholder="삭제용 비밀번호" class="input-field">
+                <div class="form-footer" style="display:flex; gap: 0.75rem; flex-wrap: wrap;">
+                    <button class="btn btn-primary" type="button" onclick="submitPost()">등록하기</button>
+                    <button class="btn btn-secondary" type="button" onclick="toggleForm()">닫기</button>
                 </div>
+            </div>
+        </div>
+
+        <div id="post-detail" class="card reveal" style="display:none; margin-top: 2rem;">
+            <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:1rem; flex-wrap:wrap;">
+                <div>
+                    <h3 id="detail-title" style="margin-bottom:0.5rem;"></h3>
+                    <p id="detail-meta" style="color:#666; margin-bottom:1rem;"></p>
+                </div>
+                <div style="display:flex; gap:0.5rem; flex-wrap:wrap;">
+                    <button class="btn btn-primary" type="button" onclick="likeCurrentPost()">좋아요</button>
+                    <button class="btn btn-secondary" type="button" onclick="promptDeletePost()">삭제</button>
+                    <button class="btn btn-secondary" type="button" onclick="closePostDetail()">닫기</button>
+                </div>
+            </div>
+
+            <div id="detail-content" style="white-space:pre-wrap; line-height:1.8; margin:1rem 0 2rem;"></div>
+
+            <hr style="border:none; border-top:1px solid #e5e7eb; margin: 1.5rem 0;">
+
+            <h4 style="margin-bottom:1rem;">댓글</h4>
+            <div id="comment-list" style="margin-bottom:1rem;">
+                댓글을 불러오는 중입니다...
+            </div>
+
+            <div class="form-group">
+                <input type="text" id="comment-author" placeholder="댓글 작성자" class="input-field">
+                <textarea id="comment-content" placeholder="댓글 내용을 입력하세요" class="input-field" rows="4"></textarea>
+                <button class="btn btn-primary" type="button" onclick="submitComment()">댓글 등록</button>
             </div>
         </div>
     </section>
 
-    <script type="module" src="script.js"></script>
+    <script src="script.js"></script>
 </body>
 </html>
