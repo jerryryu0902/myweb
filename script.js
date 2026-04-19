@@ -1,18 +1,26 @@
 /**
- * 류재정 로봇 자동화 포트폴리오 - 인터랙티브 엔진 (LocalStorage 통합 버전)
+ * 류재정 로봇 자동화 포트폴리오 - Firebase Realtime Database 게시판 버전
  */
 
+const FIREBASE_DB_URL = "https://myweb-6bc43-default-rtdb.firebaseio.com";
+let currentPostId = null;
+
+/* --------------------------------
+ * 공통 초기화
+ * -------------------------------- */
 document.addEventListener('DOMContentLoaded', () => {
     initRevealAnimation();
     initAntiGravityControl();
-    // 페이지 로드 시 저장된 게시글 불러오기
-    loadPosts(); 
+    loadPosts();
 });
 
 /**
- * 1. 스크롤 애니메이션 (기존 기능 유지)
+ * 1. 스크롤 애니메이션
  */
 function initRevealAnimation() {
+    const revealElements = document.querySelectorAll('.reveal');
+    if (!revealElements.length) return;
+
     const observerOptions = {
         threshold: 0.15,
         rootMargin: '0px 0px -50px 0px'
@@ -26,11 +34,11 @@ function initRevealAnimation() {
         });
     }, observerOptions);
 
-    document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
+    revealElements.forEach(el => revealObserver.observe(el));
 }
 
 /**
- * 2. 마우스 상호작용 부유 효과 (기존 기능 유지)
+ * 2. 마우스 상호작용 부유 효과
  */
 function initAntiGravityControl() {
     const floatTarget = document.querySelector('.anti-gravity-wrapper');
@@ -44,88 +52,380 @@ function initAntiGravityControl() {
     }
 }
 
-/**
- * 3. 게시판 기능 (LocalStorage 연동)
- */
+/* --------------------------------
+ * 게시판 기능
+ * -------------------------------- */
 
 // 글쓰기 폼 토글
 function toggleForm() {
     const form = document.getElementById('write-form');
     if (!form) return;
-    const isHidden = form.style.display === 'none';
-    form.style.display = isHidden ? 'block' : 'none';
-    if (isHidden) {
-        form.scrollIntoView({ behavior: 'smooth' });
+
+    const currentDisplay = window.getComputedStyle(form).display;
+    const willOpen = currentDisplay === 'none';
+
+    form.style.display = willOpen ? 'block' : 'none';
+
+    if (willOpen) {
+        form.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
-}
-
-// 게시글 저장
-function submitPost() {
-    const titleEl = document.getElementById('title');
-    const authorEl = document.getElementById('author');
-    const contentEl = document.getElementById('content');
-
-    if (!titleEl.value || !authorEl.value) {
-        alert('제목과 작성자 정보를 모두 입력해 주세요.');
-        return;
-    }
-
-    const today = new Date();
-    const dateStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
-    
-    const newPost = {
-        id: Date.now(),
-        title: titleEl.value,
-        author: authorEl.value,
-        content: contentEl.value,
-        date: dateStr
-    };
-
-    // 로컬 스토리지 데이터 처리
-    const posts = JSON.parse(localStorage.getItem('boardPosts')) || [];
-    posts.unshift(newPost);
-    localStorage.setItem('boardPosts', JSON.stringify(posts));
-
-    alert(`[시스템] '${authorEl.value}' 님의 게시글이 등록되었습니다.`);
-    
-    // 초기화
-    titleEl.value = '';
-    authorEl.value = '';
-    contentEl.value = '';
-    toggleForm();
-    loadPosts();
 }
 
 // 게시글 목록 불러오기
-function loadPosts() {
+async function loadPosts() {
     const boardList = document.getElementById('board-list');
     if (!boardList) return;
 
-    const posts = JSON.parse(localStorage.getItem('boardPosts')) || [];
-    boardList.innerHTML = '';
+    boardList.innerHTML = `
+        <tr>
+            <td colspan="5" style="text-align:center; padding:20px;">데이터를 불러오는 중입니다...</td>
+        </tr>
+    `;
 
-    if (posts.length === 0) {
-        boardList.innerHTML = '<tr><td colspan="4" style="text-align:center; padding:20px;">등록된 게시글이 없습니다.</td></tr>';
+    try {
+        const response = await fetch(`${FIREBASE_DB_URL}/posts.json`);
+        if (!response.ok) {
+            throw new Error(`목록 조회 실패 (${response.status})`);
+        }
+
+        const data = await response.json();
+
+        if (!data) {
+            boardList.innerHTML = `
+                <tr>
+                    <td colspan="5" style="text-align:center; padding:20px;">등록된 게시글이 없습니다.</td>
+                </tr>
+            `;
+            return;
+        }
+
+        const posts = Object.entries(data).map(([id, post]) => ({
+            id,
+            ...post
+        }));
+
+        posts.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+
+        boardList.innerHTML = '';
+
+        posts.forEach((post, index) => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td>${posts.length - index}</td>
+                <td style="cursor:pointer; color:#3498db; font-weight:bold;" onclick="viewPost('${post.id}')">
+                    ${escapeHtml(post.title || '')}
+                </td>
+                <td>${escapeHtml(post.author || '')}</td>
+                <td>${formatDate(post.createdAt)}</td>
+                <td>${post.likes || 0}</td>
+            `;
+            boardList.appendChild(row);
+        });
+    } catch (error) {
+        console.error(error);
+        boardList.innerHTML = `
+            <tr>
+                <td colspan="5" style="text-align:center; padding:20px; color:#d32f2f;">
+                    게시글을 불러오지 못했습니다. Firebase 규칙 또는 DB 주소를 확인하세요.
+                </td>
+            </tr>
+        `;
+    }
+}
+
+// 게시글 등록
+async function submitPost() {
+    const titleEl = document.getElementById('title');
+    const authorEl = document.getElementById('author');
+    const contentEl = document.getElementById('content');
+    const pwdEl = document.getElementById('pwd');
+
+    if (!titleEl || !authorEl || !contentEl || !pwdEl) {
+        alert('게시글 입력 폼을 찾을 수 없습니다.');
         return;
     }
 
-    posts.forEach((post, index) => {
-        const row = document.createElement('tr');
-        row.innerHTML = `
-            <td>${posts.length - index}</td>
-            <td style="cursor:pointer; color:#3498db; font-weight:bold;" onclick="viewPost(${post.id})">${post.title}</td>
-            <td>${post.author}</td>
-            <td>${post.date}</td>
-        `;
-        boardList.appendChild(row);
-    });
+    const title = titleEl.value.trim();
+    const author = authorEl.value.trim();
+    const content = contentEl.value.trim();
+    const password = pwdEl.value.trim();
+
+    if (!title || !author || !content || !password) {
+        alert('제목, 작성자, 내용, 비밀번호를 모두 입력해 주세요.');
+        return;
+    }
+
+    const newPost = {
+        title,
+        author,
+        content,
+        password,
+        createdAt: Date.now(),
+        likes: 0
+    };
+
+    try {
+        const response = await fetch(`${FIREBASE_DB_URL}/posts.json`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(newPost)
+        });
+
+        if (!response.ok) {
+            throw new Error(`게시글 등록 실패 (${response.status})`);
+        }
+
+        titleEl.value = '';
+        authorEl.value = '';
+        contentEl.value = '';
+        pwdEl.value = '';
+
+        alert('게시글이 등록되었습니다.');
+        toggleForm();
+        await loadPosts();
+    } catch (error) {
+        console.error(error);
+        alert('게시글 등록에 실패했습니다. Firebase 규칙을 확인하세요.');
+    }
 }
 
 // 게시글 상세 보기
-function viewPost(postId) {
-    const posts = JSON.parse(localStorage.getItem('boardPosts')) || [];
-    const post = posts.find(p => p.id === postId);
-    if (post) {
-        alert(`제목: ${post.title}\n작성자: ${post.author}\n날짜: ${post.date}\n\n내용:\n${post.content}`);
+async function viewPost(postId) {
+    try {
+        const response = await fetch(`${FIREBASE_DB_URL}/posts/${postId}.json`);
+        if (!response.ok) {
+            throw new Error(`게시글 조회 실패 (${response.status})`);
+        }
+
+        const post = await response.json();
+
+        if (!post) {
+            alert('게시글이 존재하지 않습니다.');
+            return;
+        }
+
+        currentPostId = postId;
+
+        const detailBox = document.getElementById('post-detail');
+        const titleBox = document.getElementById('detail-title');
+        const metaBox = document.getElementById('detail-meta');
+        const contentBox = document.getElementById('detail-content');
+
+        titleBox.textContent = post.title || '(제목 없음)';
+        metaBox.textContent = `작성자: ${post.author || '-'} | 날짜: ${formatDate(post.createdAt)} | 좋아요: ${post.likes || 0}`;
+        contentBox.textContent = post.content || '';
+
+        detailBox.style.display = 'block';
+        detailBox.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+        await loadComments(postId);
+    } catch (error) {
+        console.error(error);
+        alert('게시글을 불러오지 못했습니다.');
     }
+}
+
+// 상세 닫기
+function closePostDetail() {
+    const detailBox = document.getElementById('post-detail');
+    if (detailBox) detailBox.style.display = 'none';
+    currentPostId = null;
+}
+
+// 좋아요
+async function likeCurrentPost() {
+    if (!currentPostId) {
+        alert('먼저 게시글을 선택해 주세요.');
+        return;
+    }
+
+    try {
+        const response = await fetch(`${FIREBASE_DB_URL}/posts/${currentPostId}.json`);
+        if (!response.ok) {
+            throw new Error(`게시글 조회 실패 (${response.status})`);
+        }
+
+        const post = await response.json();
+        if (!post) {
+            alert('게시글이 존재하지 않습니다.');
+            return;
+        }
+
+        const newLikes = (post.likes || 0) + 1;
+
+        const updateResponse = await fetch(`${FIREBASE_DB_URL}/posts/${currentPostId}.json`, {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ likes: newLikes })
+        });
+
+        if (!updateResponse.ok) {
+            throw new Error(`좋아요 반영 실패 (${updateResponse.status})`);
+        }
+
+        await viewPost(currentPostId);
+        await loadPosts();
+    } catch (error) {
+        console.error(error);
+        alert('좋아요 처리에 실패했습니다.');
+    }
+}
+
+// 삭제
+async function promptDeletePost() {
+    if (!currentPostId) {
+        alert('먼저 게시글을 선택해 주세요.');
+        return;
+    }
+
+    const inputPwd = prompt('삭제 비밀번호를 입력하세요.');
+    if (!inputPwd) return;
+
+    try {
+        const response = await fetch(`${FIREBASE_DB_URL}/posts/${currentPostId}.json`);
+        if (!response.ok) {
+            throw new Error(`게시글 조회 실패 (${response.status})`);
+        }
+
+        const post = await response.json();
+        if (!post) {
+            alert('게시글이 존재하지 않습니다.');
+            return;
+        }
+
+        if (post.password !== inputPwd) {
+            alert('비밀번호가 일치하지 않습니다.');
+            return;
+        }
+
+        const deletePostRes = await fetch(`${FIREBASE_DB_URL}/posts/${currentPostId}.json`, {
+            method: 'DELETE'
+        });
+
+        if (!deletePostRes.ok) {
+            throw new Error(`게시글 삭제 실패 (${deletePostRes.status})`);
+        }
+
+        await fetch(`${FIREBASE_DB_URL}/comments/${currentPostId}.json`, {
+            method: 'DELETE'
+        });
+
+        alert('게시글이 삭제되었습니다.');
+        closePostDetail();
+        await loadPosts();
+    } catch (error) {
+        console.error(error);
+        alert('게시글 삭제에 실패했습니다.');
+    }
+}
+
+/* --------------------------------
+ * 댓글 기능
+ * -------------------------------- */
+async function loadComments(postId) {
+    const commentList = document.getElementById('comment-list');
+    if (!commentList) return;
+
+    commentList.innerHTML = '댓글을 불러오는 중입니다...';
+
+    try {
+        const response = await fetch(`${FIREBASE_DB_URL}/comments/${postId}.json`);
+        if (!response.ok) {
+            throw new Error(`댓글 조회 실패 (${response.status})`);
+        }
+
+        const data = await response.json();
+
+        if (!data) {
+            commentList.innerHTML = '<p style="color:#666;">아직 댓글이 없습니다.</p>';
+            return;
+        }
+
+        const comments = Object.entries(data).map(([id, comment]) => ({
+            id,
+            ...comment
+        }));
+
+        comments.sort((a, b) => (a.createdAt || 0) - (b.createdAt || 0));
+
+        commentList.innerHTML = comments.map(comment => `
+            <div style="padding:1rem; border:1px solid #e5e7eb; border-radius:12px; margin-bottom:0.75rem; background:#fff;">
+                <div style="font-weight:700; margin-bottom:0.35rem;">${escapeHtml(comment.author || '익명')}</div>
+                <div style="white-space:pre-wrap; margin-bottom:0.5rem;">${escapeHtml(comment.content || '')}</div>
+                <div style="font-size:0.9rem; color:#777;">${formatDate(comment.createdAt)}</div>
+            </div>
+        `).join('');
+    } catch (error) {
+        console.error(error);
+        commentList.innerHTML = '<p style="color:#d32f2f;">댓글을 불러오지 못했습니다.</p>';
+    }
+}
+
+async function submitComment() {
+    if (!currentPostId) {
+        alert('먼저 게시글을 선택해 주세요.');
+        return;
+    }
+
+    const authorEl = document.getElementById('comment-author');
+    const contentEl = document.getElementById('comment-content');
+
+    if (!authorEl || !contentEl) return;
+
+    const author = authorEl.value.trim();
+    const content = contentEl.value.trim();
+
+    if (!author || !content) {
+        alert('댓글 작성자와 내용을 입력해 주세요.');
+        return;
+    }
+
+    const newComment = {
+        author,
+        content,
+        createdAt: Date.now()
+    };
+
+    try {
+        const response = await fetch(`${FIREBASE_DB_URL}/comments/${currentPostId}.json`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(newComment)
+        });
+
+        if (!response.ok) {
+            throw new Error(`댓글 등록 실패 (${response.status})`);
+        }
+
+        authorEl.value = '';
+        contentEl.value = '';
+
+        await loadComments(currentPostId);
+    } catch (error) {
+        console.error(error);
+        alert('댓글 등록에 실패했습니다.');
+    }
+}
+
+/* --------------------------------
+ * 유틸
+ * -------------------------------- */
+function formatDate(timestamp) {
+    if (!timestamp) return '-';
+
+    const date = new Date(timestamp);
+    const y = date.getFullYear();
+    const m = String(date.getMonth() + 1).padStart(2, '0');
+    const d = String(date.getDate()).padStart(2, '0');
+
+    return `${y}-${m}-${d}`;
+}
+
+function escapeHtml(str) {
+    return String(str)
+        .replaceAll('&', '&amp;')
+        .replaceAll('<', '&lt;')
+        .replaceAll('>', '&gt;')
+        .replaceAll('"', '&quot;')
+        .replaceAll("'", '&#39;');
 }
