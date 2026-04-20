@@ -104,7 +104,7 @@ async function loadPosts() {
             ...post
         }));
 
-        posts.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+        posts.sort((a, b) => (b.updatedAt || b.createdAt || 0) - (a.updatedAt || a.createdAt || 0));
 
         boardList.innerHTML = '';
 
@@ -116,7 +116,7 @@ async function loadPosts() {
                     ${escapeHtml(post.title || '')}
                 </td>
                 <td>${escapeHtml(post.author || '')}</td>
-                <td>${formatDate(post.createdAt)}</td>
+                <td>${formatDate(post.updatedAt || post.createdAt)}</td>
                 <td>${post.likes || 0}</td>
             `;
             boardList.appendChild(row);
@@ -212,7 +212,11 @@ async function viewPost(postId) {
         const contentBox = document.getElementById('detail-content');
 
         titleBox.textContent = post.title || '(제목 없음)';
-        metaBox.textContent = `작성자: ${post.author || '-'} | 날짜: ${formatDate(post.createdAt)} | 좋아요: ${post.likes || 0}`;
+
+        const createdText = `작성일: ${formatDate(post.createdAt)}`;
+        const updatedText = post.updatedAt ? ` | 수정일: ${formatDate(post.updatedAt)}` : '';
+        metaBox.textContent = `작성자: ${post.author || '-'} | ${createdText}${updatedText} | 좋아요: ${post.likes || 0}`;
+
         contentBox.textContent = post.content || '';
 
         detailBox.style.display = 'block';
@@ -268,6 +272,72 @@ async function likeCurrentPost() {
     } catch (error) {
         console.error(error);
         alert('좋아요 처리에 실패했습니다.');
+    }
+}
+
+// 게시글 수정
+async function promptEditPost() {
+    if (!currentPostId) {
+        alert('먼저 게시글을 선택해 주세요.');
+        return;
+    }
+
+    const inputPwd = prompt('수정 비밀번호를 입력하세요.');
+    if (!inputPwd) return;
+
+    try {
+        const response = await fetch(`${FIREBASE_DB_URL}/posts/${currentPostId}.json`);
+        if (!response.ok) {
+            throw new Error(`게시글 조회 실패 (${response.status})`);
+        }
+
+        const post = await response.json();
+
+        if (!post) {
+            alert('게시글이 존재하지 않습니다.');
+            return;
+        }
+
+        if (post.password !== inputPwd) {
+            alert('비밀번호가 일치하지 않습니다.');
+            return;
+        }
+
+        const newTitle = prompt('수정할 제목을 입력하세요.', post.title || '');
+        if (newTitle === null) return;
+
+        const newAuthor = prompt('수정할 작성자를 입력하세요.', post.author || '');
+        if (newAuthor === null) return;
+
+        const newContent = prompt('수정할 내용을 입력하세요.', post.content || '');
+        if (newContent === null) return;
+
+        if (!newTitle.trim() || !newAuthor.trim() || !newContent.trim()) {
+            alert('제목, 작성자, 내용을 모두 입력해 주세요.');
+            return;
+        }
+
+        const updateResponse = await fetch(`${FIREBASE_DB_URL}/posts/${currentPostId}.json`, {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                title: newTitle.trim(),
+                author: newAuthor.trim(),
+                content: newContent.trim(),
+                updatedAt: Date.now()
+            })
+        });
+
+        if (!updateResponse.ok) {
+            throw new Error(`게시글 수정 실패 (${updateResponse.status})`);
+        }
+
+        alert('게시글이 수정되었습니다.');
+        await viewPost(currentPostId);
+        await loadPosts();
+    } catch (error) {
+        console.error(error);
+        alert('게시글 수정에 실패했습니다.');
     }
 }
 
