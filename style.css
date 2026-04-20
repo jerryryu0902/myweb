@@ -178,3 +178,293 @@ footer { text-align: center; padding: 2rem; border-top: 1px solid rgba(0,0,0,0.0
     .bg-aura { width: 400px; height: 400px; }
     .hero-content p { margin: 0 auto 2.5rem; }
 }
+/* =========================
+   Board / Mobile Improvements
+   ========================= */
+
+html, body {
+    overflow-x: hidden;
+}
+
+img {
+    max-width: 100%;
+    height: auto;
+}
+
+.post-title-cell {
+    cursor: pointer;
+    color: #3498db;
+    font-weight: bold;
+    word-break: keep-all;
+    overflow-wrap: break-word;
+}
+
+.board-mobile-list {
+    display: none;
+}
+
+.board-mobile-card {
+    background: #fff;
+    border: 1px solid rgba(0, 85, 255, 0.08);
+    border-radius: 16px;
+    padding: 1rem;
+    margin-top: 1rem;
+    box-shadow: 0 6px 18px rgba(0, 85, 255, 0.04);
+}
+
+.board-mobile-top {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 0.75rem;
+    color: var(--primary-color);
+    font-size: 0.9rem;
+    font-weight: 700;
+}
+
+.board-mobile-title {
+    cursor: pointer;
+    color: #3498db;
+    font-size: 1.05rem;
+    font-weight: 800;
+    line-height: 1.5;
+    margin-bottom: 0.8rem;
+    word-break: keep-all;
+    overflow-wrap: break-word;
+}
+
+.board-mobile-meta {
+    display: grid;
+    gap: 0.45rem;
+    color: var(--text-main);
+    font-size: 0.95rem;
+}
+
+.board-mobile-meta strong {
+    color: var(--primary-color);
+    margin-right: 0.4rem;
+}
+
+.board-mobile-empty {
+    text-align: center;
+    padding: 1rem;
+    color: #666;
+}
+
+/* 태블릿 이하 */
+@media (max-width: 1024px) {
+    nav {
+        padding: 1rem 5%;
+        gap: 1rem;
+        flex-wrap: wrap;
+    }
+
+    .logo {
+        font-size: 1.2rem;
+        line-height: 1.15;
+        white-space: nowrap;
+    }
+
+    .nav-links {
+        width: 100%;
+        justify-content: center;
+        flex-wrap: wrap;
+        gap: 1rem 1.5rem;
+    }
+
+    .hero {
+        padding: 10rem 5% 4rem;
+        gap: 2rem;
+    }
+
+    .hero h1 {
+        font-size: 3rem;
+        line-height: 1.2;
+    }
+
+    .hero-content p {
+        font-size: 1rem;
+        max-width: 100%;
+    }
+
+    .hero-btns {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 1rem;
+    }
+
+    section {
+        padding: 7rem 5% 3rem;
+    }
+
+    .section-header h2 {
+        font-size: 2.4rem;
+        line-height: 1.25;
+    }
+
+    .subject-columns {
+        grid-template-columns: 1fr;
+        gap: 0;
+    }
+
+    .grid-3 {
+        grid-template-columns: 1fr;
+    }
+
+    .photo-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .board-table,
+    .data-table {
+        display: block;
+        overflow-x: auto;
+        white-space: nowrap;
+    }
+}
+
+/* 모바일 */
+@media (max-width: 768px) {
+    nav {
+        padding: 0.9rem 4%;
+        align-items: flex-start;
+    }
+
+    .logo {
+        font-size: 1.05rem;
+        white-space: nowrap;
+    }
+
+    .nav-links {
+        width: 100%;
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: flex-start;
+        gap: 0.6rem 1rem;
+    }
+
+    .nav-links a {
+        font-size: 0.88rem;
+    }
+
+    .hero {
+        padding-top: 8.5rem;
+        padding-bottom: 3rem;
+    }
+
+    .hero h1 {
+        font-size: 2.35rem;
+        word-break: keep-all;
+    }
+
+    .step-label {
+        font-size: 0.78rem;
+        letter-spacing: 1.5px;
+    }
+
+    .hero-content p {
+        font-size: 0.95rem;
+        line-height: 1.7;
+        word-break: keep-all;
+    }
+
+    .btn {
+        width: 100%;
+        text-align: center;
+        padding: 0.95rem 1.4rem;
+    }
+
+    .main-robot {
+        max-width: 280px;
+    }
+
+    .float-info {
+        width: 100%;
+        text-align: center;
+    }
+
+    .section-header {
+        margin-bottom: 2.5rem;
+    }
+
+    .section-header h2 {
+        font-size: 2rem;
+        word-break: keep-all;
+    }
+
+    .card,
+    .roadmap-card {
+        padding: 1.5rem;
+        border-radius: 18px;
+    }
+
+    .timeline {
+        margin-left: 0;
+        padding-left: 1.5rem;
+    }
+
+    .timeline-item::before {
+        left: -2.05rem;
+    }
+
+    .photo-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .photo-wrapper {
+        height: 200px;
+    }
+
+    /* 모바일에서는 게시판을 카드형으로 */
+    .board-table {
+        display: none;
+    }
+
+    .board-mobile-list {
+        display: block;
+    }
+}
+
+@media (max-width: 480px) {
+    .logo {
+        font-size: 0.95rem;
+    }
+
+    .nav-links {
+        gap: 0.5rem 0.85rem;
+    }
+
+    .nav-links a {
+        font-size: 0.82rem;
+    }
+
+    .hero h1 {
+        font-size: 1.95rem;
+    }
+
+    .hero-content p {
+        font-size: 0.9rem;
+    }
+
+    .section-header h2 {
+        font-size: 1.65rem;
+    }
+
+    .card,
+    .roadmap-card {
+        padding: 1.2rem;
+    }
+
+    .board-mobile-card {
+        padding: 0.9rem;
+    }
+
+    .board-mobile-title {
+        font-size: 1rem;
+    }
+
+    .board-mobile-meta {
+        font-size: 0.9rem;
+    }
+}
