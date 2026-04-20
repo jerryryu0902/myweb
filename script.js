@@ -275,15 +275,14 @@ async function likeCurrentPost() {
     }
 }
 
-// 게시글 수정
-async function promptEditPost() {
+/* --------------------------------
+ * 수정 기능
+ * -------------------------------- */
+async function openEditModal() {
     if (!currentPostId) {
         alert('먼저 게시글을 선택해 주세요.');
         return;
     }
-
-    const inputPwd = prompt('수정 비밀번호를 입력하세요.');
-    if (!inputPwd) return;
 
     try {
         const response = await fetch(`${FIREBASE_DB_URL}/posts/${currentPostId}.json`);
@@ -292,7 +291,53 @@ async function promptEditPost() {
         }
 
         const post = await response.json();
+        if (!post) {
+            alert('게시글이 존재하지 않습니다.');
+            return;
+        }
 
+        document.getElementById('edit-title').value = post.title || '';
+        document.getElementById('edit-author').value = post.author || '';
+        document.getElementById('edit-content').value = post.content || '';
+        document.getElementById('edit-pwd').value = '';
+
+        const modal = document.getElementById('edit-modal');
+        modal.style.display = 'block';
+        modal.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    } catch (error) {
+        console.error(error);
+        alert('수정창을 열지 못했습니다.');
+    }
+}
+
+function closeEditModal() {
+    const modal = document.getElementById('edit-modal');
+    if (modal) modal.style.display = 'none';
+}
+
+async function saveEditedPost() {
+    if (!currentPostId) {
+        alert('먼저 게시글을 선택해 주세요.');
+        return;
+    }
+
+    const title = document.getElementById('edit-title').value.trim();
+    const author = document.getElementById('edit-author').value.trim();
+    const content = document.getElementById('edit-content').value.trim();
+    const inputPwd = document.getElementById('edit-pwd').value.trim();
+
+    if (!title || !author || !content || !inputPwd) {
+        alert('제목, 작성자, 내용, 비밀번호를 모두 입력해 주세요.');
+        return;
+    }
+
+    try {
+        const response = await fetch(`${FIREBASE_DB_URL}/posts/${currentPostId}.json`);
+        if (!response.ok) {
+            throw new Error(`게시글 조회 실패 (${response.status})`);
+        }
+
+        const post = await response.json();
         if (!post) {
             alert('게시글이 존재하지 않습니다.');
             return;
@@ -303,27 +348,13 @@ async function promptEditPost() {
             return;
         }
 
-        const newTitle = prompt('수정할 제목을 입력하세요.', post.title || '');
-        if (newTitle === null) return;
-
-        const newAuthor = prompt('수정할 작성자를 입력하세요.', post.author || '');
-        if (newAuthor === null) return;
-
-        const newContent = prompt('수정할 내용을 입력하세요.', post.content || '');
-        if (newContent === null) return;
-
-        if (!newTitle.trim() || !newAuthor.trim() || !newContent.trim()) {
-            alert('제목, 작성자, 내용을 모두 입력해 주세요.');
-            return;
-        }
-
         const updateResponse = await fetch(`${FIREBASE_DB_URL}/posts/${currentPostId}.json`, {
             method: 'PATCH',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-                title: newTitle.trim(),
-                author: newAuthor.trim(),
-                content: newContent.trim(),
+                title,
+                author,
+                content,
                 updatedAt: Date.now()
             })
         });
@@ -333,6 +364,7 @@ async function promptEditPost() {
         }
 
         alert('게시글이 수정되었습니다.');
+        closeEditModal();
         await viewPost(currentPostId);
         await loadPosts();
     } catch (error) {
@@ -381,6 +413,7 @@ async function promptDeletePost() {
         });
 
         alert('게시글이 삭제되었습니다.');
+        closeEditModal();
         closePostDetail();
         await loadPosts();
     } catch (error) {
