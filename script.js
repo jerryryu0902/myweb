@@ -5,18 +5,12 @@
 const FIREBASE_DB_URL = "https://myweb-6bc43-default-rtdb.firebaseio.com";
 let currentPostId = null;
 
-/* --------------------------------
- * 공통 초기화
- * -------------------------------- */
 document.addEventListener('DOMContentLoaded', () => {
     initRevealAnimation();
     initAntiGravityControl();
     loadPosts();
 });
 
-/**
- * 1. 스크롤 애니메이션
- */
 function initRevealAnimation() {
     const revealElements = document.querySelectorAll('.reveal');
     if (!revealElements.length) return;
@@ -37,9 +31,6 @@ function initRevealAnimation() {
     revealElements.forEach(el => revealObserver.observe(el));
 }
 
-/**
- * 2. 마우스 상호작용 부유 효과
- */
 function initAntiGravityControl() {
     const floatTarget = document.querySelector('.anti-gravity-wrapper');
     if (floatTarget) {
@@ -52,11 +43,6 @@ function initAntiGravityControl() {
     }
 }
 
-/* --------------------------------
- * 게시판 기능
- * -------------------------------- */
-
-// 글쓰기 폼 토글
 function toggleForm() {
     const form = document.getElementById('write-form');
     if (!form) return;
@@ -71,15 +57,20 @@ function toggleForm() {
     }
 }
 
-// 게시글 목록 불러오기
 async function loadPosts() {
     const boardList = document.getElementById('board-list');
-    if (!boardList) return;
+    const boardMobileList = document.getElementById('board-mobile-list');
+
+    if (!boardList || !boardMobileList) return;
 
     boardList.innerHTML = `
         <tr>
             <td colspan="5" style="text-align:center; padding:20px;">데이터를 불러오는 중입니다...</td>
         </tr>
+    `;
+
+    boardMobileList.innerHTML = `
+        <div class="board-mobile-empty">데이터를 불러오는 중입니다...</div>
     `;
 
     try {
@@ -96,6 +87,9 @@ async function loadPosts() {
                     <td colspan="5" style="text-align:center; padding:20px;">등록된 게시글이 없습니다.</td>
                 </tr>
             `;
+            boardMobileList.innerHTML = `
+                <div class="board-mobile-empty">등록된 게시글이 없습니다.</div>
+            `;
             return;
         }
 
@@ -104,25 +98,47 @@ async function loadPosts() {
             ...post
         }));
 
-        posts.sort((a, b) => (b.updatedAt || b.createdAt || 0) - (a.updatedAt || a.createdAt || 0));
+        posts.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
 
         boardList.innerHTML = '';
+        boardMobileList.innerHTML = '';
 
         posts.forEach((post, index) => {
+            const number = posts.length - index;
+            const dateText = formatDate(post.updatedAt || post.createdAt);
+
             const row = document.createElement('tr');
             row.innerHTML = `
-                <td>${posts.length - index}</td>
-                <td style="cursor:pointer; color:#3498db; font-weight:bold;" onclick="viewPost('${post.id}')">
+                <td>${number}</td>
+                <td class="post-title-cell" onclick="viewPost('${post.id}')">
                     ${escapeHtml(post.title || '')}
                 </td>
                 <td>${escapeHtml(post.author || '')}</td>
-                <td>${formatDate(post.updatedAt || post.createdAt)}</td>
+                <td>${dateText}</td>
                 <td>${post.likes || 0}</td>
             `;
             boardList.appendChild(row);
+
+            const mobileCard = document.createElement('div');
+            mobileCard.className = 'board-mobile-card';
+            mobileCard.innerHTML = `
+                <div class="board-mobile-top">
+                    <span class="board-mobile-no">번호 ${number}</span>
+                    <span class="board-mobile-like">좋아요 ${post.likes || 0}</span>
+                </div>
+                <div class="board-mobile-title" onclick="viewPost('${post.id}')">
+                    ${escapeHtml(post.title || '')}
+                </div>
+                <div class="board-mobile-meta">
+                    <div><strong>작성자</strong> ${escapeHtml(post.author || '')}</div>
+                    <div><strong>날짜</strong> ${dateText}</div>
+                </div>
+            `;
+            boardMobileList.appendChild(mobileCard);
         });
     } catch (error) {
         console.error(error);
+
         boardList.innerHTML = `
             <tr>
                 <td colspan="5" style="text-align:center; padding:20px; color:#d32f2f;">
@@ -130,10 +146,15 @@ async function loadPosts() {
                 </td>
             </tr>
         `;
+
+        boardMobileList.innerHTML = `
+            <div class="board-mobile-empty" style="color:#d32f2f;">
+                게시글을 불러오지 못했습니다.
+            </div>
+        `;
     }
 }
 
-// 게시글 등록
 async function submitPost() {
     const titleEl = document.getElementById('title');
     const authorEl = document.getElementById('author');
@@ -189,7 +210,6 @@ async function submitPost() {
     }
 }
 
-// 게시글 상세 보기
 async function viewPost(postId) {
     try {
         const response = await fetch(`${FIREBASE_DB_URL}/posts/${postId}.json`);
@@ -229,14 +249,12 @@ async function viewPost(postId) {
     }
 }
 
-// 상세 닫기
 function closePostDetail() {
     const detailBox = document.getElementById('post-detail');
     if (detailBox) detailBox.style.display = 'none';
     currentPostId = null;
 }
 
-// 좋아요
 async function likeCurrentPost() {
     if (!currentPostId) {
         alert('먼저 게시글을 선택해 주세요.');
@@ -275,14 +293,14 @@ async function likeCurrentPost() {
     }
 }
 
-/* --------------------------------
- * 수정 기능
- * -------------------------------- */
-async function openEditModal() {
+async function promptEditPost() {
     if (!currentPostId) {
         alert('먼저 게시글을 선택해 주세요.');
         return;
     }
+
+    const inputPwd = prompt('수정 비밀번호를 입력하세요.');
+    if (!inputPwd) return;
 
     try {
         const response = await fetch(`${FIREBASE_DB_URL}/posts/${currentPostId}.json`);
@@ -291,53 +309,7 @@ async function openEditModal() {
         }
 
         const post = await response.json();
-        if (!post) {
-            alert('게시글이 존재하지 않습니다.');
-            return;
-        }
 
-        document.getElementById('edit-title').value = post.title || '';
-        document.getElementById('edit-author').value = post.author || '';
-        document.getElementById('edit-content').value = post.content || '';
-        document.getElementById('edit-pwd').value = '';
-
-        const modal = document.getElementById('edit-modal');
-        modal.style.display = 'block';
-        modal.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    } catch (error) {
-        console.error(error);
-        alert('수정창을 열지 못했습니다.');
-    }
-}
-
-function closeEditModal() {
-    const modal = document.getElementById('edit-modal');
-    if (modal) modal.style.display = 'none';
-}
-
-async function saveEditedPost() {
-    if (!currentPostId) {
-        alert('먼저 게시글을 선택해 주세요.');
-        return;
-    }
-
-    const title = document.getElementById('edit-title').value.trim();
-    const author = document.getElementById('edit-author').value.trim();
-    const content = document.getElementById('edit-content').value.trim();
-    const inputPwd = document.getElementById('edit-pwd').value.trim();
-
-    if (!title || !author || !content || !inputPwd) {
-        alert('제목, 작성자, 내용, 비밀번호를 모두 입력해 주세요.');
-        return;
-    }
-
-    try {
-        const response = await fetch(`${FIREBASE_DB_URL}/posts/${currentPostId}.json`);
-        if (!response.ok) {
-            throw new Error(`게시글 조회 실패 (${response.status})`);
-        }
-
-        const post = await response.json();
         if (!post) {
             alert('게시글이 존재하지 않습니다.');
             return;
@@ -348,13 +320,27 @@ async function saveEditedPost() {
             return;
         }
 
+        const newTitle = prompt('수정할 제목을 입력하세요.', post.title || '');
+        if (newTitle === null) return;
+
+        const newAuthor = prompt('수정할 작성자를 입력하세요.', post.author || '');
+        if (newAuthor === null) return;
+
+        const newContent = prompt('수정할 내용을 입력하세요.', post.content || '');
+        if (newContent === null) return;
+
+        if (!newTitle.trim() || !newAuthor.trim() || !newContent.trim()) {
+            alert('제목, 작성자, 내용을 모두 입력해 주세요.');
+            return;
+        }
+
         const updateResponse = await fetch(`${FIREBASE_DB_URL}/posts/${currentPostId}.json`, {
             method: 'PATCH',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-                title,
-                author,
-                content,
+                title: newTitle.trim(),
+                author: newAuthor.trim(),
+                content: newContent.trim(),
                 updatedAt: Date.now()
             })
         });
@@ -364,7 +350,6 @@ async function saveEditedPost() {
         }
 
         alert('게시글이 수정되었습니다.');
-        closeEditModal();
         await viewPost(currentPostId);
         await loadPosts();
     } catch (error) {
@@ -373,7 +358,6 @@ async function saveEditedPost() {
     }
 }
 
-// 삭제
 async function promptDeletePost() {
     if (!currentPostId) {
         alert('먼저 게시글을 선택해 주세요.');
@@ -413,7 +397,6 @@ async function promptDeletePost() {
         });
 
         alert('게시글이 삭제되었습니다.');
-        closeEditModal();
         closePostDetail();
         await loadPosts();
     } catch (error) {
@@ -422,9 +405,6 @@ async function promptDeletePost() {
     }
 }
 
-/* --------------------------------
- * 댓글 기능
- * -------------------------------- */
 async function loadComments(postId) {
     const commentList = document.getElementById('comment-list');
     if (!commentList) return;
@@ -510,9 +490,6 @@ async function submitComment() {
     }
 }
 
-/* --------------------------------
- * 유틸
- * -------------------------------- */
 function formatDate(timestamp) {
     if (!timestamp) return '-';
 
