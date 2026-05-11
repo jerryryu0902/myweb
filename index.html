@@ -3,49 +3,208 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>류재정 포트폴리오 | 로봇 자동화 테크니컬 아키텍트</title>
-    <link rel="stylesheet" href="style.css">
+    <title>Unitree Safety | 센서 기반 통합 안전 솔루션</title>
+    <style>
+        :root {
+            --primary-blue: #002B5C; /* 로보티즈 네이비 */
+            --accent-red: #E60012;   /* 포인트 레드 */
+            --light-gray: #F4F7F9;
+            --white: #ffffff;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', sans-serif; color: #333; line-height: 1.6; background-color: var(--white); }
+
+        /* 네비게이션 */
+        nav {
+            position: fixed; top: 0; width: 100%; padding: 20px 50px;
+            display: flex; justify-content: space-between; align-items: center;
+            background: rgba(255, 255, 255, 0.95); z-index: 1000; border-bottom: 1px solid #eee;
+        }
+        .logo { font-size: 1.5rem; font-weight: 800; color: var(--primary-blue); }
+        .nav-links { list-style: none; display: flex; gap: 30px; }
+        .nav-links a { text-decoration: none; color: #333; font-weight: 600; font-size: 0.9rem; }
+
+        /* ① 히어로 섹션 */
+        .hero {
+            height: 100vh;
+            background: linear-gradient(rgba(0,43,92,0.5), rgba(0,43,92,0.5)), url('유니트리.gif');
+            background-size: cover; background-position: center;
+            display: flex; align-items: center; justify-content: center;
+            color: var(--white); text-align: center;
+        }
+        .hero-content h1 { font-size: clamp(2rem, 5vw, 3.5rem); font-weight: 800; margin-bottom: 20px; }
+        .hero-content p { font-size: 1.2rem; margin-bottom: 30px; opacity: 0.9; }
+
+        /* ② 솔루션 카드 섹션 */
+        .container { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
+        .solutions { padding: 100px 0; background: var(--light-gray); }
+        .section-title { text-align: center; font-size: 2.5rem; color: var(--primary-blue); margin-bottom: 60px; font-weight: 800; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 30px; }
+        .card { background: white; border-radius: 8px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.05); transition: 0.3s; }
+        .card:hover { transform: translateY(-10px); }
+        .card-img { height: 230px; background-size: cover; background-position: center; }
+        .card-body { padding: 30px; }
+        .card-body h3 { color: var(--primary-blue); margin-bottom: 15px; }
+
+        /* ③ 기술 상세 (움직임 GIF) */
+        .tech-detail { padding: 100px 0; display: flex; align-items: center; gap: 50px; flex-wrap: wrap; }
+        .tech-img { flex: 1; min-width: 300px; border-radius: 10px; overflow: hidden; box-shadow: 20px 20px 0 var(--primary-blue); }
+        .tech-img img { width: 100%; display: block; }
+        .tech-info { flex: 1; min-width: 300px; }
+
+        /* ④ 실시간 게시판 섹션 */
+        .board-section { padding: 100px 0; background: white; }
+        table { width: 100%; border-collapse: collapse; margin-bottom: 30px; }
+        th { background: var(--primary-blue); color: white; padding: 12px; }
+        td { padding: 12px; border-bottom: 1px solid #ddd; text-align: center; }
+        .input-group { background: var(--light-gray); padding: 30px; border-radius: 10px; border: 1px solid #ddd; }
+        input, textarea { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ccc; border-radius: 5px; }
+
+        /* ⑤ 메일 문의 섹션 */
+        .contact-section { padding: 100px 0; background: var(--light-gray); }
+        .contact-form { max-width: 700px; margin: 0 auto; background: white; padding: 40px; border-radius: 10px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); }
+
+        .btn { border: none; padding: 15px 30px; border-radius: 5px; cursor: pointer; font-weight: bold; transition: 0.3s; }
+        .btn-blue { background: var(--primary-blue); color: white; }
+        .btn-red { background: var(--accent-red); color: white; width: 100%; font-size: 1.1rem; }
+        .edit-btn { background: #ffc107; border: none; padding: 5px 10px; border-radius: 3px; cursor: pointer; }
+
+        footer { text-align: center; padding: 40px 0; background: #333; color: #888; }
+    </style>
 </head>
 <body>
+
     <nav>
-        <a href="index.html" class="logo">RYU JAE JEONG</a>
+        <div class="logo">UNITREE SAFETY</div>
         <ul class="nav-links">
-            <li><a href="index.html">Home</a></li>
-            <li><a href="projects.html">Projects</a></li>
-            <li><a href="class.html">Class</a></li>
-            <li><a href="history.html">History</a></li>
-            <li><a href="board.html">Board</a></li>
-            <li><a href="contact.html">Contact</a></li>
+            <li><a href="#home">Home</a></li>
+            <li><a href="#solutions">Solutions</a></li>
+            <li><a href="#board">Board</a></li>
+            <li><a href="#contact">Contact</a></li>
         </ul>
     </nav>
 
-    <section class="hero">
-        <div class="bg-aura"></div>
-        <div class="hero-content reveal">
-            <span class="step-label">Robot Software Specialist</span>
-            <h1>시대의 한계를 극복하는<br><span class="highlight">엔지니어</span></h1>
-            <p>HW의 물리적 한계를 SW 알고리즘으로 극복합니다. <br>반도체 이송 로봇의 정밀 제어와 효율적인 시스템 아키텍처를 설계합니다.</p>
-            <div class="hero-btns">
-                <a href="projects.html" class="btn btn-primary">프로젝트 성과 분석</a>
-                <a href="class.html" class="btn btn-secondary">전공 역량 확인</a>
-            </div>
+    <header id="home" class="hero">
+        <div class="hero-content">
+            <h1>지능형 센서로 현장의 안전을 설계하다</h1>
+            <p>Unitree의 3D LiDAR와 AI 비전이 결합된 압도적인 안정성 솔루션</p>
         </div>
-        <div class="hero-image-container">
-            <div class="anti-gravity-wrapper floating">
-                <img src="assets/메인화면 사람사진.png" alt="시대의 한계를 극복하는 엔지니어 프로필 사진" class="main-robot" style="border-radius: 50%; width: 350px; height: 350px; object-fit: cover; box-shadow: 0 20px 40px rgba(0,0,0,0.2);">
-                <div class="shadow"></div>
-            </div>
-            <div class="glass-card float-info reveal">
-                <h4>HW+SW Convergence</h4>
-                <p>아크릴 정밀 가공 & PID 가감속 구현</p>
+    </header>
+
+    <section id="solutions" class="solutions">
+        <div class="container">
+            <h2 class="section-title">Safety Solutions</h2>
+            <div class="grid">
+                <div class="card">
+                    <div class="card-img" style="background-image: url('31590_205728_5732.jpg');"></div>
+                    <div class="card-body">
+                        <h3>전방위 위험 감지</h3>
+                        <p>고정밀 센서를 통해 산업 현장의 사각지대를 제로화합니다.</p>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-img" style="background-image: url('43293_95120_412.jpg');"></div>
+                    <div class="card-body">
+                        <h3>자세 제어 시스템</h3>
+                        <p>험지에서도 무너지지 않는 안정적인 주행을 실현합니다.</p>
+                    </div>
+                </div>
             </div>
         </div>
     </section>
 
-    <footer>
-        <p class="footer-text">© 2026 Ryu Jae Jeong. Focused on Robot Software & Automation Excellence.</p>
-    </footer>
+    <section class="container tech-detail">
+        <div class="tech-img"><img src="로봇 움직임.gif" alt="Robot Movement"></div>
+        <div class="tech-info">
+            <h2 style="color:var(--primary-blue); margin-bottom:20px;">Adaptive Motion Technology</h2>
+            <p>센서 기반의 적응형 알고리즘을 통해 실시간으로 지면 상황을 파악합니다. 위험 구역에서의 안정적인 임무 수행을 보장하는 핵심 기술입니다.</p>
+        </div>
+    </section>
 
-    <script src="script.js"></script>
+    <section id="board" class="board-section">
+        <div class="container">
+            <h2 style="color:var(--primary-blue); margin-bottom:30px;">📋 Technical Support Board</h2>
+            <table>
+                <thead><tr><th>작성자</th><th>제목</th><th>날짜</th><th>관리</th></tr></thead>
+                <tbody id="board-body"><tr><td colspan="4">데이터를 불러오는 중...</td></tr></tbody>
+            </table>
+            <div class="input-group">
+                <h3 id="form-title">게시글 작성/수정</h3>
+                <input type="hidden" id="post-id"> 
+                <input type="text" id="author" placeholder="작성자 성함">
+                <input type="text" id="title" placeholder="내용 요약">
+                <button class="btn btn-blue" id="submit-btn">실시간 저장하기</button>
+            </div>
+        </div>
+    </section>
+
+    <section id="contact" class="contact-section">
+        <div class="container">
+            <h2 class="section-title">Contact Us</h2>
+            <div class="contact-form">
+                <form action="https://formsubmit.co/jerryryu0902@dongyang.ac.kr" method="POST">
+                    <input type="hidden" name="_captcha" value="false">
+                    <input type="text" name="name" placeholder="성함" required>
+                    <input type="email" name="email" placeholder="회신 메일 주소" required>
+                    <textarea name="message" rows="5" placeholder="문의 사항을 입력해 주세요." required></textarea>
+                    <button type="submit" class="btn btn-red">이메일 문의하기 (발송)</button>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <footer><p>&copy; 2024 Unitree Safety Partner.</p></footer>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-app.js";
+        import { getDatabase, ref, push, onValue, update } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-database.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyC0GtGE5tQQpikwfxT2TCp3DCoLtn_vhMY",
+            authDomain: "myweb-6bc43.firebaseapp.com",
+            projectId: "myweb-6bc43",
+            databaseURL: "https://myweb-6bc43-default-rtdb.firebaseio.com"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+        const postsRef = ref(db, 'posts');
+
+        // 저장/수정 함수
+        document.getElementById('submit-btn').onclick = function() {
+            const id = document.getElementById('post-id').value;
+            const author = document.getElementById('author').value;
+            const title = document.getElementById('title').value;
+            const date = new Date().toLocaleDateString();
+
+            if(!author || !title) return alert("내용을 입력하세요!");
+
+            if(id) {
+                update(ref(db, 'posts/'+id), { author, title, date }).then(()=>alert("수정됨"));
+            } else {
+                push(postsRef, { author, title, date });
+            }
+            document.getElementById('post-id').value=""; document.getElementById('author').value=""; document.getElementById('title').value="";
+        };
+
+        // 불러오기
+        onValue(postsRef, (snapshot) => {
+            const data = snapshot.val();
+            const tbody = document.getElementById('board-body');
+            tbody.innerHTML = "";
+            for (let id in data) {
+                tbody.innerHTML += `<tr><td>${data[id].author}</td><td>${data[id].title}</td><td>${data[id].date}</td>
+                <td><button class="edit-btn" onclick="prepareEdit('${id}','${data[id].author}','${data[id].title}')">수정</button></td></tr>`;
+            }
+        });
+
+        window.prepareEdit = (id, author, title) => {
+            document.getElementById('post-id').value = id;
+            document.getElementById('author').value = author;
+            document.getElementById('title').value = title;
+            document.getElementById('form-title').innerText = "게시글 수정 중";
+        };
+    </script>
 </body>
 </html>
