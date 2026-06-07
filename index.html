@@ -3,159 +3,376 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Unitree Safety | 센서 기반 통합 안전 솔루션</title>
+    <title>RYU-TECH | 로봇 지능 및 자율 제어 소프트웨어 아키텍처</title>
     <style>
         :root {
-            --primary-blue: #002B5C; /* 로보티즈 네이비 */
-            --accent-red: #E60012;   /* 포인트 레드 */
-            --light-gray: #F4F7F9;
+            --primary-blue: #002B5C; /* 로보티즈 네이비 기반 메인 솔리드 톤 */
+            --accent-red: #E60012;   /* 엔지니어링 포인트 레드 */
+            --light-gray: #F4F7F9;   /* UI 시각 계층 분리용 배경 그레이 */
             --white: #ffffff;
+            --dark-text: #1e293b;
+            --body-text: #475569;
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Inter', sans-serif; color: #333; line-height: 1.6; background-color: var(--white); }
-
-        /* 네비게이션 */
-        nav {
-            position: fixed; top: 0; width: 100%; padding: 20px 50px;
-            display: flex; justify-content: space-between; align-items: center;
-            background: rgba(255, 255, 255, 0.95); z-index: 1000; border-bottom: 1px solid #eee;
+        body { 
+            font-family: 'Inter', 'Noto Sans KR', sans-serif; 
+            color: var(--body-text); 
+            line-height: 1.8; 
+            background-color: var(--white); 
+            letter-spacing: -0.02em;
         }
-        .logo { font-size: 1.5rem; font-weight: 800; color: var(--primary-blue); }
-        .nav-links { list-style: none; display: flex; gap: 30px; }
-        .nav-links a { text-decoration: none; color: #333; font-weight: 600; font-size: 0.9rem; }
+
+        /* 네비게이션 및 마이크로 인터랙션 */
+        nav {
+            position: fixed;
+            top: 0; width: 100%; padding: 20px 50px;
+            display: flex; justify-content: space-between; align-items: center;
+            background: rgba(255, 255, 255, 0.95); z-index: 1000;
+            border-bottom: 1px solid #e2e8f0;
+            backdrop-filter: blur(10px);
+        }
+        .logo { font-size: 1.5rem; font-weight: 800; color: var(--primary-blue); letter-spacing: 1px; }
+        .nav-links { list-style: none; display: flex; gap: 35px; }
+        .nav-links a { 
+            text-decoration: none; 
+            color: var(--dark-text); 
+            font-weight: 600; 
+            font-size: 0.95rem; 
+            transition: color 0.3s ease; 
+        }
+        .nav-links a:hover { color: var(--primary-blue); }
 
         /* ① 히어로 섹션 */
         .hero {
             height: 100vh;
-            background: linear-gradient(rgba(0,43,92,0.5), rgba(0,43,92,0.5)), url('유니트리.gif');
+            background: linear-gradient(rgba(0, 43, 92, 0.65), rgba(0, 43, 92, 0.75)), url('image_5a0cca.gif');
             background-size: cover; background-position: center;
             display: flex; align-items: center; justify-content: center;
             color: var(--white); text-align: center;
+            padding: 0 20px;
         }
-        .hero-content h1 { font-size: clamp(2rem, 5vw, 3.5rem); font-weight: 800; margin-bottom: 20px; }
-        .hero-content p { font-size: 1.2rem; margin-bottom: 30px; opacity: 0.9; }
+        .hero-content { max-width: 900px; }
+        .hero-content h1 { 
+            font-size: clamp(2.2rem, 5vw, 3.8rem); 
+            font-weight: 800; 
+            margin-bottom: 25px; 
+            letter-spacing: -1px;
+            line-height: 1.2;
+        }
+        .hero-content p { 
+            font-size: 1.3rem; 
+            font-weight: 300;
+            max-width: 750px; 
+            margin: 0 auto; 
+            opacity: 0.95; 
+            word-break: keep-all; 
+            line-height: 1.6;
+        }
+
+        /* 기업 개요 및 비전 섹션 (COMPANY - 비대칭 이미지 배치형) */
+        .company-intro { padding: 140px 0; background: var(--white); }
+        .company-grid { display: flex; gap: 60px; align-items: center; flex-wrap: wrap; margin-bottom: 50px; }
+        .company-text { flex: 1.2; min-width: 400px; }
+        .company-img { flex: 0.8; min-width: 300px; border-radius: 12px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.08); }
+        .company-img img { width: 100%; display: block; }
+        
+        .metric-grid { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); 
+            gap: 30px; 
+            text-align: center;
+        }
+        .metric-card { background: var(--light-gray); padding: 35px 20px; border-radius: 8px; border-top: 3px solid var(--primary-blue); }
+        .metric-card h4 { font-size: 2.5rem; color: var(--primary-blue); font-weight: 800; margin-bottom: 10px; font-family: 'Inter', sans-serif; }
+        .metric-card p { font-size: 0.95rem; color: var(--dark-text); font-weight: 600; }
 
         /* ② 솔루션 카드 섹션 */
-        .container { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
-        .solutions { padding: 100px 0; background: var(--light-gray); }
-        .section-title { text-align: center; font-size: 2.5rem; color: var(--primary-blue); margin-bottom: 60px; font-weight: 800; }
-        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 30px; }
-        .card { background: white; border-radius: 8px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.05); transition: 0.3s; }
-        .card:hover { transform: translateY(-10px); }
-        .card-img { height: 230px; background-size: cover; background-position: center; }
-        .card-body { padding: 30px; }
-        .card-body h3 { color: var(--primary-blue); margin-bottom: 15px; }
+        .solutions { padding: 140px 0; background: var(--light-gray); }
+        .section-title { 
+            text-align: center; 
+            font-size: 2.6rem; 
+            color: var(--primary-blue); 
+            margin-bottom: 15px; 
+            font-weight: 800; 
+        }
+        .section-subtitle {
+            text-align: center;
+            font-size: 1.1rem;
+            color: #64748b;
+            margin-bottom: 70px;
+            word-break: keep-all;
+        }
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(450px, 1fr)); gap: 40px; }
+        .card { 
+            background: var(--white); 
+            border-radius: 12px; 
+            overflow: hidden; 
+            box-shadow: 0 10px 30px rgba(0,0,0,0.04); 
+            transition: transform 0.4s cubic-bezier(0.165, 0.84, 0.44, 1), box-shadow 0.4s; 
+        }
+        .card:hover { 
+            transform: translateY(-10px); 
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1); 
+        }
+        .card-img { height: 280px; background-size: cover; background-position: center; }
+        .card-body { padding: 40px; }
+        .card-body h3 { color: var(--primary-blue); margin-bottom: 18px; font-size: 1.5rem; font-weight: 700; }
+        .card-body p { color: var(--body-text); font-size: 1rem; text-align: justify; }
 
-        /* ③ 기술 상세 (움직임 GIF) */
-        .tech-detail { padding: 100px 0; display: flex; align-items: center; gap: 50px; flex-wrap: wrap; }
-        .tech-img { flex: 1; min-width: 300px; border-radius: 10px; overflow: hidden; box-shadow: 20px 20px 0 var(--primary-blue); }
+        /* 비즈니스 제품 공급 및 세일즈 섹션 (BUSINESS) */
+        .business-sales { padding: 140px 0; background: #0f172a; color: #f1f5f9; }
+        .business-grid { display: flex; gap: 60px; align-items: center; flex-wrap: wrap; }
+        .business-info { flex: 1.2; min-width: 400px; }
+        .business-info h3 { font-size: 2rem; color: var(--white); margin-bottom: 25px; font-weight: 700; }
+        .business-info p { color: #94a3b8; margin-bottom: 30px; text-align: justify; }
+        .product-list { list-style: none; }
+        .product-item { background: #1e293b; padding: 20px 25px; border-radius: 6px; margin-bottom: 15px; border-left: 4px solid var(--accent-red); }
+        .product-item h4 { font-size: 1.15rem; color: var(--white); margin-bottom: 5px; }
+        .product-item p { font-size: 0.9rem; color: #94a3b8; margin-bottom: 0; }
+        .business-img { flex: 0.8; min-width: 300px; border-radius: 12px; overflow: hidden; box-shadow: 0 15px 40px rgba(0,0,0,0.3); }
+        .business-img img { width: 100%; display: block; opacity: 0.9; }
+
+        /* ③ 기술 상세 및 엔지니어링 철학 */
+        .tech-detail { padding: 140px 0; display: flex; align-items: center; gap: 70px; flex-wrap: wrap; }
+        .tech-img { 
+            flex: 1; 
+            min-width: 400px; 
+            border-radius: 12px; 
+            overflow: hidden; 
+            box-shadow: 25px 25px 0 var(--primary-blue); 
+        }
         .tech-img img { width: 100%; display: block; }
-        .tech-info { flex: 1; min-width: 300px; }
+        .tech-info { flex: 1; min-width: 400px; }
+        .tech-info h2 { color: var(--primary-blue); font-size: 2.3rem; margin-bottom: 25px; font-weight: 800; line-height: 1.3; }
+        .tech-info p { color: var(--body-text); font-size: 1.05rem; text-align: justify; margin-bottom: 20px; }
+        .tech-info .highlight-box {
+            background-color: var(--light-gray);
+            padding: 25px;
+            border-left: 4px solid var(--primary-blue);
+            border-radius: 0 8px 8px 0;
+            font-style: italic;
+            font-weight: 500;
+            color: #1e293b;
+            margin-top: 25px;
+        }
 
         /* ④ 실시간 게시판 섹션 */
-        .board-section { padding: 100px 0; background: white; }
-        table { width: 100%; border-collapse: collapse; margin-bottom: 30px; }
-        th { background: var(--primary-blue); color: white; padding: 12px; }
-        td { padding: 12px; border-bottom: 1px solid #ddd; text-align: center; }
-        .input-group { background: var(--light-gray); padding: 30px; border-radius: 10px; border: 1px solid #ddd; }
-        input, textarea { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ccc; border-radius: 5px; }
+        .board-section { padding: 140px 0; background: var(--white); }
+        .board-section h2 { color: var(--primary-blue); font-size: 2.2rem; margin-bottom: 40px; font-weight: 800; }
+        table { width: 100%; border-collapse: collapse; margin-bottom: 50px; box-shadow: 0 4px 15px rgba(0,0,0,0.02); }
+        th { background: var(--primary-blue); color: var(--white); padding: 18px; font-weight: 600; font-size: 1rem; }
+        td { padding: 18px; border-bottom: 1px solid #e2e8f0; text-align: center; color: #334155; font-size: 0.95rem; }
+        tr:hover td { background-color: #f8fafc; }
+        .input-group { background: var(--light-gray); padding: 45px; border-radius: 12px; border: 1px solid #e2e8f0; }
+        .input-group h3 { color: var(--primary-blue); margin-bottom: 25px; font-size: 1.3rem; }
+        input, textarea { 
+            width: 100%; padding: 15px; margin: 12px 0; 
+            border: 1px solid #cbd5e1; border-radius: 6px; 
+            outline: none; font-size: 1rem; background: var(--white);
+            transition: border-color 0.3s;
+        }
+        input:focus, textarea:focus { border-color: var(--primary-blue); box-shadow: 0 0 0 3px rgba(0, 43, 92, 0.1); }
 
         /* ⑤ 메일 문의 섹션 */
-        .contact-section { padding: 100px 0; background: var(--light-gray); }
-        .contact-form { max-width: 700px; margin: 0 auto; background: white; padding: 40px; border-radius: 10px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); }
+        .contact-section { padding: 140px 0; background: var(--light-gray); }
+        .contact-form { 
+            max-width: 800px; margin: 0 auto; background: var(--white); 
+            padding: 55px; border-radius: 12px; box-shadow: 0 15px 35px rgba(0,0,0,0.04); 
+        }
 
-        .btn { border: none; padding: 15px 30px; border-radius: 5px; cursor: pointer; font-weight: bold; transition: 0.3s; }
-        .btn-blue { background: var(--primary-blue); color: white; }
-        .btn-red { background: var(--accent-red); color: white; width: 100%; font-size: 1.1rem; }
-        .edit-btn { background: #ffc107; border: none; padding: 5px 10px; border-radius: 3px; cursor: pointer; }
+        /* 버튼 마이크로 인터랙션 */
+        .btn { border: none; padding: 16px 35px; border-radius: 6px; cursor: pointer; font-weight: 700; transition: all 0.3s ease; font-size: 1rem; }
+        .btn-blue { background: var(--primary-blue); color: var(--white); }
+        .btn-blue:hover { background: #001938; transform: translateY(-1px); }
+        .btn-red { background: var(--accent-red); color: var(--white); width: 100%; font-size: 1.1rem; letter-spacing: 1px; }
+        .btn-red:hover { background: #b3000d; box-shadow: 0 8px 20px rgba(230, 0, 18, 0.2); }
+        .edit-btn { background: #ffc107; border: none; padding: 6px 14px; border-radius: 4px; cursor: pointer; font-weight: 600; color: #1e293b; }
+        .edit-btn:hover { background: #e0a800; }
 
-        footer { text-align: center; padding: 40px 0; background: #333; color: #888; }
+        footer { text-align: center; padding: 60px 0; background: #0f172a; color: #94a3b8; font-size: 0.95rem; border-top: 4px solid var(--primary-blue); }
+        footer p { opacity: 0.8; }
+
+        /* 반응형 모바일 대응 */
+        @media (max-width: 968px) {
+            .grid, .business-grid, .company-grid { grid-template-columns: 1fr; }
+            .tech-detail { gap: 40px; }
+            .tech-img, .business-info, .business-img, .company-text, .company-img { min-width: 100%; }
+        }
+        @media (max-width: 768px) {
+            nav { padding: 15px 25px; }
+            .nav-links { display: none; }
+            .solutions, .board-section, .contact-section, .company-intro, .business-sales { padding: 90px 0; }
+            .contact-form { padding: 35px 20px; }
+            td, th { padding: 12px 8px; font-size: 0.85rem; }
+        }
     </style>
 </head>
 <body>
 
+    <!-- 상단 내비게이션 -->
     <nav>
-        <div class="logo">UNITREE SAFETY</div>
+        <div class="logo">RYU-TECH</div>
         <ul class="nav-links">
             <li><a href="#home">Home</a></li>
+            <li><a href="#company">Company</a></li>
             <li><a href="#solutions">Solutions</a></li>
+            <li><a href="#business">Business</a></li>
             <li><a href="#board">Board</a></li>
             <li><a href="#contact">Contact</a></li>
         </ul>
     </nav>
 
+    <!-- ① 히어로 비주얼 영역 -->
     <header id="home" class="hero">
         <div class="hero-content">
-            <h1>지능형 센서로 현장의 안전을 설계하다</h1>
-            <p>Unitree의 3D LiDAR와 AI 비전이 결합된 압도적인 안정성 솔루션</p>
+            <h1>OVERCOMING LIMITS BY SOFTWARE</h1>
+            <p>RYU-TECH은 제어 대상 하드웨어가 가진 물리적 인프라의 한계를 다축 임베디드 코어 알고리즘과 신경망 레이어 분석을 통해 유연하게 극복해 냅니다.</p>
         </div>
     </header>
 
+    <!-- 기업 개요 소개 구역 (COMPANY - 신규 사옥 이미지 연동 완벽 반영) -->
+    <section id="company" class="company-intro">
+        <div class="container">
+            <div class="company-grid">
+                <div class="company-text">
+                    <h2 class="section-title" style="text-align: left; margin-bottom: 25px;">About RYU-TECH</h2>
+                    <p style="font-size: 1.15rem; color: var(--dark-text); font-weight: 500; margin-bottom: 20px;">류텍(RYU-TECH)은 인공지능(AI)과 로봇 자율성 시스템 융합 프레임워크를 공급하는 대한민국 로봇 소프트웨어의 기술 표준 아키텍처 기업입니다.</p>
+                    <p style="font-size: 1rem; text-align: justify; color: var(--body-text);">우리는 불완전한 하드웨어 바디를 유연하게 제어하는 고정밀 임베디드 라이브러리를 연구 및 양산하고 있습니다. 반도체 메카트로닉스 공정 라인의 최적 가감속 펌웨어 설계부터 인간 중심의 자율 협동 운영체제(OS)까지, 무너져가는 산업 인프라를 지탱하는 디지털 신경망 기술 솔루션을 전 세계 파트너사에 공급합니다.</p>
+                </div>
+                <!-- 📸 가져오신 초고화질 사옥 전경 이미지 연동 완료 -->
+                <div class="company-img">
+                    <img src="image_59a7ac.png" alt="RYU-TECH Tech Center Headquarters">
+                </div>
+            </div>
+            
+            <div class="metric-grid">
+                <div class="metric-card">
+                    <h4>0.1 ms</h4>
+                    <p>고속 임베디드 피드백 제어 주기</p>
+                </div>
+                <div class="metric-card">
+                    <h4>99.8%</h4>
+                    <p>센서 외란 노이즈 필터링 신뢰도</p>
+                </div>
+                <div class="metric-card">
+                    <h4>45+</h4>
+                    <p>국내외 반도체 및 물류 협력 기업</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ② 전문 솔루션 아티클 섹션 -->
     <section id="solutions" class="solutions">
         <div class="container">
-            <h2 class="section-title">Safety Solutions</h2>
+            <h2 class="section-title">AI & Robotics Convergence</h2>
+            <p class="section-subtitle">인간의 물리적·인지적 임계 한계를 완전히 확장하는 류텍의 핵심 지능형 모듈</p>
+            
             <div class="grid">
+                <!-- 솔루션 1: 물리적 한계 극복 및 초정밀화 -->
                 <div class="card">
                     <div class="card-img" style="background-image: url('31590_205728_5732.jpg');"></div>
                     <div class="card-body">
-                        <h3>전방위 위험 감지</h3>
-                        <p>고정밀 센서를 통해 산업 현장의 사각지대를 제로화합니다.</p>
+                        <h3>물리적 한계 극복 및 초정밀 제어</h3>
+                        <p>반도체, 디스플레이, 바이오 공정 등 나노(nm) 단위 정밀 영역에서 기구 거동 시 발생하는 미세 관성 오차와 충격(Stuttering)을 해결합니다. 인간의 미세한 손떨림이나 단순 물리 기어 구조만으로는 제어하기 힘든 백래시(Backlash) 문제를 수 밀리초(ms) 단위의 피드백 루프 알고리즘과 PID 제어 기술 융합으로 상쇄하여 수율을 극대화합니다.</p>
                     </div>
                 </div>
+                <!-- 솔루션 2: 인지적 한계 확장 및 센서 노이즈 필터링 -->
                 <div class="card">
-                    <div class="card-img" style="background-image: url('43293_95120_412.jpg');"></div>
+                    <div class="card-img" style="background-image: url('31590_205730_5733.jpg');"></div>
                     <div class="card-body">
-                        <h3>자세 제어 시스템</h3>
-                        <p>험지에서도 무너지지 않는 안정적인 주행을 실현합니다.</p>
+                        <h3>인지적 한계 확장 및 센서 노이즈 필터링</h3>
+                        <p>복잡한 물류 창고나 고속 가동 라인 단에서 주변 환경의 간섭으로 인해 발생하는 무작위 데이터 노이즈를 제어합니다. 임베디드 소프트웨어 기반의 수학적 필터링과 소프트웨어적 디바운싱(Debouncing) 알고리즘을 적용해 수만 개의 신호 속에서 유의미한 정보만을 추출하고 딜레이를 최적화하여 자율형 제어를 완성합니다.</p>
                     </div>
                 </div>
             </div>
         </div>
     </section>
 
-    <section class="container tech-detail">
-        <div class="tech-img"><img src="로봇 움직임.gif" alt="Robot Movement"></div>
-        <div class="tech-info">
-            <h2 style="color:var(--primary-blue); margin-bottom:20px;">Adaptive Motion Technology</h2>
-            <p>센서 기반의 적응형 알고리즘을 통해 실시간으로 지면 상황을 파악합니다. 위험 구역에서의 안정적인 임무 수행을 보장하는 핵심 기술입니다.</p>
+    <!-- 비즈니스 제품 판매 및 B2B 마켓 솔루션 안내 공급 영역 (BUSINESS - 토니 스타크 짤 연동 완벽 반영) -->
+    <section id="business" class="business-sales">
+        <div class="container">
+            <div class="business-grid">
+                <div class="business-info">
+                    <h3>RYU-TECH Core Technology Supply</h3>
+                    <p>류텍은 글로벌 엔지니어링 기업 및 제조 공장을 대상으로 자체 개발한 독점 지능형 커널 소프트웨어 패키지와 고성능 다축 임베디드 제어 로봇 키트를 B2B 형태로 양산·판매하고 있습니다.</p>
+                    
+                    <div class="product-list">
+                        <div class="product-item">
+                            <h4>1. RT-Kernel AI Vision v4.2 (소프트웨어 커널 라이스선스 공급)</h4>
+                            <p>실시간 LiDAR 포인트 클라우드 매핑 및 시각 데이터 분산 연산 처리용 딥러닝 임베디드 코어 모듈입니다.</p>
+                        </div>
+                        <div class="product-item">
+                            <h4>2. High-Torque Multi-Axis Actuator Kit (지능형 임베디드 구동기 판매)</h4>
+                            <p>물리적 마찰 저항과 백래시 오차를 자가 보정 알고리즘 인터페이스로 상쇄하는 스마트 구동 부품 유닛입니다.</p>
+                        </div>
+                    </div>
+                </div>
+                <!-- 📸 가져오신 하드웨어 융합 시스템 아키텍처 비주얼 연동 완료 -->
+                <div class="business-img">
+                    <img src="image_59ab0b.jpg" alt="RYU-TECH Robotics Integration Research Studio">
+                </div>
+            </div>
         </div>
     </section>
 
+    <!-- ③ 기술 상세 설명 및 엔지니어링 철학 고찰 -->
+    <section class="container tech-detail">
+        <div class="tech-img"><img src="로봇 움직임.gif" alt="RYU-TECH Humanoid Motion Engine"></div>
+        <div class="tech-info">
+            <h2>Modern Robotics Paradigm Shift</h2>
+            <p>과거의 로봇 공학 기술이 거대한 안전 철제 펜스 내에 기계를 격리해 두고 정해진 좌표(G-code) 시퀀스만을 무한 반복 수행하게 하던 무지한 자동화에 그쳤다면, 현시대의 로봇 공학은 경계를 허물고 인간과 같은 공간에서 호흡하는 자율 협동 기술로 나아갑니다.</p>
+            <p>아무리 정밀하게 설계를 고도화하고 재료를 가공해도, 공기 저항이나 배선의 전류 미세 변화 등 물리적 외란 요소를 하드웨어 혼자 힘으로 완벽하게 제어할 수는 없습니다.</p>
+            <div class="highlight-box">
+                "하드웨어라는 견고하고 제한적인 물리적 뼈대 위에, 소프트웨어라는 유연하고 연속적인 신경망 알고리즘을 심어 숨을 불어넣는 아키텍처 시스템 설계야말로 진정한 현대 로봇소프트웨어 공학의 정체성이자 종착지입니다."
+            </div>
+        </div>
+    </section>
+
+    <!-- ④ 기술 지원 실시간 파이어베이스 게시판 -->
     <section id="board" class="board-section">
         <div class="container">
-            <h2 style="color:var(--primary-blue); margin-bottom:30px;">📋 Technical Support Board</h2>
+            <h2>📋 Real-time Engine Support Board</h2>
             <table>
                 <thead><tr><th>작성자</th><th>제목</th><th>날짜</th><th>관리</th></tr></thead>
-                <tbody id="board-body"><tr><td colspan="4">데이터를 불러오는 중...</td></tr></tbody>
+                <tbody id="board-body"><tr><td colspan="4">데이터를 동기화하는 중입니다...</td></tr></tbody>
             </table>
             <div class="input-group">
-                <h3 id="form-title">게시글 작성/수정</h3>
+                <h3 id="form-title">엔지니어링 질의 / 피드백 수렴</h3>
                 <input type="hidden" id="post-id"> 
-                <input type="text" id="author" placeholder="작성자 성함">
-                <input type="text" id="title" placeholder="내용 요약">
-                <button class="btn btn-blue" id="submit-btn">실시간 저장하기</button>
+                <input type="text" id="author" placeholder="작성자 성함 및 소속 기관">
+                <input type="text" id="title" placeholder="기술 피드백 및 시스템 디버깅 요약 내용">
+                <button class="btn btn-blue" id="submit-btn">실시간 동기화 및 저장</button>
             </div>
         </div>
     </section>
 
+    <!-- ⑤ 1:1 최고기술책임자 직접 이메일 핫라인 -->
     <section id="contact" class="contact-section">
         <div class="container">
-            <h2 class="section-title">Contact Us</h2>
+            <h2 class="section-title">Direct Contact To CEO</h2>
             <div class="contact-form">
                 <form action="https://formsubmit.co/jerryryu0902@dongyang.ac.kr" method="POST">
                     <input type="hidden" name="_captcha" value="false">
-                    <input type="text" name="name" placeholder="성함" required>
-                    <input type="email" name="email" placeholder="회신 메일 주소" required>
-                    <textarea name="message" rows="5" placeholder="문의 사항을 입력해 주세요." required></textarea>
-                    <button type="submit" class="btn btn-red">이메일 문의하기 (발송)</button>
+                    <input type="text" name="name" placeholder="의뢰인 성함 / 파트너 기업명" required>
+                    <input type="email" name="email" placeholder="회신받으실 비즈니스 메일 주소" required>
+                    <textarea name="message" rows="5" placeholder="인구 생산성 절벽 위기에 대응하기 위한 시스템 연동 규격 및 소프트웨어 요구사항 아키텍처를 자유롭게 기재해 주세요." required></textarea>
+                    <button type="submit" class="btn btn-red">이메일 기술 문의 요청 (보안 암호화 발송)</button>
                 </form>
             </div>
         </div>
     </section>
 
-    <footer><p>&copy; 2024 Unitree Safety Partner.</p></footer>
+    <!-- 푸터 -->
+    <footer>
+        <div style="max-width: 1200px; margin: 0 auto; padding: 0 20px;">
+            <p style="font-weight:700; margin-bottom: 10px; color:#fff;">RYU-TECH EMBEDDED SYSTEM ARCHITECTURE LAB</p>
+            <p>&copy; 2026 RYU-TECH. 인류의 한계를 확장하는 소프트웨어 지능 가치 구현. All rights reserved.</p>
+        </div>
+    </footer>
 
+    <!-- 파이어베이스 실시간 백엔드 연결 코어 스크립트 모듈 -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-app.js";
         import { getDatabase, ref, push, onValue, update } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-database.js";
@@ -171,31 +388,40 @@
         const db = getDatabase(app);
         const postsRef = ref(db, 'posts');
 
-        // 저장/수정 함수
         document.getElementById('submit-btn').onclick = function() {
             const id = document.getElementById('post-id').value;
-            const author = document.getElementById('author').value;
-            const title = document.getElementById('title').value;
+            const author = document.getElementById('author').value.trim();
+            const title = document.getElementById('title').value.trim();
             const date = new Date().toLocaleDateString();
 
-            if(!author || !title) return alert("내용을 입력하세요!");
+            if(!author || !title) return alert("데이터 입력 필드가 비어 있습니다.");
 
             if(id) {
-                update(ref(db, 'posts/'+id), { author, title, date }).then(()=>alert("수정됨"));
+                update(ref(db, 'posts/'+id), { author, title, date }).then(()=>alert("성공적으로 데이터가 수정 동기화되었습니다."));
             } else {
                 push(postsRef, { author, title, date });
             }
             document.getElementById('post-id').value=""; document.getElementById('author').value=""; document.getElementById('title').value="";
+            document.getElementById('form-title').innerText = "게시글 작성/수정";
         };
 
-        // 불러오기
         onValue(postsRef, (snapshot) => {
             const data = snapshot.val();
             const tbody = document.getElementById('board-body');
             tbody.innerHTML = "";
+            
+            if(!data) {
+                tbody.innerHTML = `<tr><td colspan="4" style="color:#94a3b8;">등록된 엔지니어링 피드백 아티클이 없습니다.</td></tr>`;
+                return;
+            }
+
             for (let id in data) {
-                tbody.innerHTML += `<tr><td>${data[id].author}</td><td>${data[id].title}</td><td>${data[id].date}</td>
-                <td><button class="edit-btn" onclick="prepareEdit('${id}','${data[id].author}','${data[id].title}')">수정</button></td></tr>`;
+                tbody.innerHTML += `<tr>
+                    <td style="font-weight:600; color:#1e293b;">${data[id].author}</td>
+                    <td style="text-align:left; padding-left:30px;">${data[id].title}</td>
+                    <td style="color:#64748b; font-size:0.85rem;">${data[id].date}</td>
+                    <td><button class="edit-btn" onclick="prepareEdit('${id}','${data[id].author}','${data[id].title}')">제어</button></td>
+                </tr>`;
             }
         });
 
@@ -203,7 +429,8 @@
             document.getElementById('post-id').value = id;
             document.getElementById('author').value = author;
             document.getElementById('title').value = title;
-            document.getElementById('form-title').innerText = "게시글 수정 중";
+            document.getElementById('form-title').innerText = "선택된 세션 데이터 수정 디버깅 중";
+            document.getElementById('title').focus();
         };
     </script>
 </body>
