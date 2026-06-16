@@ -1,437 +1,242 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RYU-TECH | 로봇 지능 및 자율 제어 소프트웨어 아키텍처</title>
-    <style>
-        :root {
-            --primary-blue: #002B5C; /* 로보티즈 네이비 기반 메인 솔리드 톤 */
-            --accent-red: #E60012;   /* 엔지니어링 포인트 레드 */
-            --light-gray: #F4F7F9;   /* UI 시각 계층 분리용 배경 그레이 */
-            --white: #ffffff;
-            --dark-text: #1e293b;
-            --body-text: #475569;
-        }
-
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { 
-            font-family: 'Inter', 'Noto Sans KR', sans-serif; 
-            color: var(--body-text); 
-            line-height: 1.8; 
-            background-color: var(--white); 
-            letter-spacing: -0.02em;
-        }
-
-        /* 네비게이션 및 마이크로 인터랙션 */
-        nav {
-            position: fixed;
-            top: 0; width: 100%; padding: 20px 50px;
-            display: flex; justify-content: space-between; align-items: center;
-            background: rgba(255, 255, 255, 0.95); z-index: 1000;
-            border-bottom: 1px solid #e2e8f0;
-            backdrop-filter: blur(10px);
-        }
-        .logo { font-size: 1.5rem; font-weight: 800; color: var(--primary-blue); letter-spacing: 1px; }
-        .nav-links { list-style: none; display: flex; gap: 35px; }
-        .nav-links a { 
-            text-decoration: none; 
-            color: var(--dark-text); 
-            font-weight: 600; 
-            font-size: 0.95rem; 
-            transition: color 0.3s ease; 
-        }
-        .nav-links a:hover { color: var(--primary-blue); }
-
-        /* ① 히어로 섹션 */
-        .hero {
-            height: 100vh;
-            background: linear-gradient(rgba(0, 43, 92, 0.65), rgba(0, 43, 92, 0.75)), url('image_5a0cca.gif');
-            background-size: cover; background-position: center;
-            display: flex; align-items: center; justify-content: center;
-            color: var(--white); text-align: center;
-            padding: 0 20px;
-        }
-        .hero-content { max-width: 900px; }
-        .hero-content h1 { 
-            font-size: clamp(2.2rem, 5vw, 3.8rem); 
-            font-weight: 800; 
-            margin-bottom: 25px; 
-            letter-spacing: -1px;
-            line-height: 1.2;
-        }
-        .hero-content p { 
-            font-size: 1.3rem; 
-            font-weight: 300;
-            max-width: 750px; 
-            margin: 0 auto; 
-            opacity: 0.95; 
-            word-break: keep-all; 
-            line-height: 1.6;
-        }
-
-        /* 기업 개요 및 비전 섹션 (COMPANY - 비대칭 이미지 배치형) */
-        .company-intro { padding: 140px 0; background: var(--white); }
-        .company-grid { display: flex; gap: 60px; align-items: center; flex-wrap: wrap; margin-bottom: 50px; }
-        .company-text { flex: 1.2; min-width: 400px; }
-        .company-img { flex: 0.8; min-width: 300px; border-radius: 12px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.08); }
-        .company-img img { width: 100%; display: block; }
-        
-        .metric-grid { 
-            display: grid; 
-            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); 
-            gap: 30px; 
-            text-align: center;
-        }
-        .metric-card { background: var(--light-gray); padding: 35px 20px; border-radius: 8px; border-top: 3px solid var(--primary-blue); }
-        .metric-card h4 { font-size: 2.5rem; color: var(--primary-blue); font-weight: 800; margin-bottom: 10px; font-family: 'Inter', sans-serif; }
-        .metric-card p { font-size: 0.95rem; color: var(--dark-text); font-weight: 600; }
-
-        /* ② 솔루션 카드 섹션 */
-        .solutions { padding: 140px 0; background: var(--light-gray); }
-        .section-title { 
-            text-align: center; 
-            font-size: 2.6rem; 
-            color: var(--primary-blue); 
-            margin-bottom: 15px; 
-            font-weight: 800; 
-        }
-        .section-subtitle {
-            text-align: center;
-            font-size: 1.1rem;
-            color: #64748b;
-            margin-bottom: 70px;
-            word-break: keep-all;
-        }
-        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(450px, 1fr)); gap: 40px; }
-        .card { 
-            background: var(--white); 
-            border-radius: 12px; 
-            overflow: hidden; 
-            box-shadow: 0 10px 30px rgba(0,0,0,0.04); 
-            transition: transform 0.4s cubic-bezier(0.165, 0.84, 0.44, 1), box-shadow 0.4s; 
-        }
-        .card:hover { 
-            transform: translateY(-10px); 
-            box-shadow: 0 20px 40px rgba(0,0,0,0.1); 
-        }
-        .card-img { height: 280px; background-size: cover; background-position: center; }
-        .card-body { padding: 40px; }
-        .card-body h3 { color: var(--primary-blue); margin-bottom: 18px; font-size: 1.5rem; font-weight: 700; }
-        .card-body p { color: var(--body-text); font-size: 1rem; text-align: justify; }
-
-        /* 비즈니스 제품 공급 및 세일즈 섹션 (BUSINESS) */
-        .business-sales { padding: 140px 0; background: #0f172a; color: #f1f5f9; }
-        .business-grid { display: flex; gap: 60px; align-items: center; flex-wrap: wrap; }
-        .business-info { flex: 1.2; min-width: 400px; }
-        .business-info h3 { font-size: 2rem; color: var(--white); margin-bottom: 25px; font-weight: 700; }
-        .business-info p { color: #94a3b8; margin-bottom: 30px; text-align: justify; }
-        .product-list { list-style: none; }
-        .product-item { background: #1e293b; padding: 20px 25px; border-radius: 6px; margin-bottom: 15px; border-left: 4px solid var(--accent-red); }
-        .product-item h4 { font-size: 1.15rem; color: var(--white); margin-bottom: 5px; }
-        .product-item p { font-size: 0.9rem; color: #94a3b8; margin-bottom: 0; }
-        .business-img { flex: 0.8; min-width: 300px; border-radius: 12px; overflow: hidden; box-shadow: 0 15px 40px rgba(0,0,0,0.3); }
-        .business-img img { width: 100%; display: block; opacity: 0.9; }
-
-        /* ③ 기술 상세 및 엔지니어링 철학 */
-        .tech-detail { padding: 140px 0; display: flex; align-items: center; gap: 70px; flex-wrap: wrap; }
-        .tech-img { 
-            flex: 1; 
-            min-width: 400px; 
-            border-radius: 12px; 
-            overflow: hidden; 
-            box-shadow: 25px 25px 0 var(--primary-blue); 
-        }
-        .tech-img img { width: 100%; display: block; }
-        .tech-info { flex: 1; min-width: 400px; }
-        .tech-info h2 { color: var(--primary-blue); font-size: 2.3rem; margin-bottom: 25px; font-weight: 800; line-height: 1.3; }
-        .tech-info p { color: var(--body-text); font-size: 1.05rem; text-align: justify; margin-bottom: 20px; }
-        .tech-info .highlight-box {
-            background-color: var(--light-gray);
-            padding: 25px;
-            border-left: 4px solid var(--primary-blue);
-            border-radius: 0 8px 8px 0;
-            font-style: italic;
-            font-weight: 500;
-            color: #1e293b;
-            margin-top: 25px;
-        }
-
-        /* ④ 실시간 게시판 섹션 */
-        .board-section { padding: 140px 0; background: var(--white); }
-        .board-section h2 { color: var(--primary-blue); font-size: 2.2rem; margin-bottom: 40px; font-weight: 800; }
-        table { width: 100%; border-collapse: collapse; margin-bottom: 50px; box-shadow: 0 4px 15px rgba(0,0,0,0.02); }
-        th { background: var(--primary-blue); color: var(--white); padding: 18px; font-weight: 600; font-size: 1rem; }
-        td { padding: 18px; border-bottom: 1px solid #e2e8f0; text-align: center; color: #334155; font-size: 0.95rem; }
-        tr:hover td { background-color: #f8fafc; }
-        .input-group { background: var(--light-gray); padding: 45px; border-radius: 12px; border: 1px solid #e2e8f0; }
-        .input-group h3 { color: var(--primary-blue); margin-bottom: 25px; font-size: 1.3rem; }
-        input, textarea { 
-            width: 100%; padding: 15px; margin: 12px 0; 
-            border: 1px solid #cbd5e1; border-radius: 6px; 
-            outline: none; font-size: 1rem; background: var(--white);
-            transition: border-color 0.3s;
-        }
-        input:focus, textarea:focus { border-color: var(--primary-blue); box-shadow: 0 0 0 3px rgba(0, 43, 92, 0.1); }
-
-        /* ⑤ 메일 문의 섹션 */
-        .contact-section { padding: 140px 0; background: var(--light-gray); }
-        .contact-form { 
-            max-width: 800px; margin: 0 auto; background: var(--white); 
-            padding: 55px; border-radius: 12px; box-shadow: 0 15px 35px rgba(0,0,0,0.04); 
-        }
-
-        /* 버튼 마이크로 인터랙션 */
-        .btn { border: none; padding: 16px 35px; border-radius: 6px; cursor: pointer; font-weight: 700; transition: all 0.3s ease; font-size: 1rem; }
-        .btn-blue { background: var(--primary-blue); color: var(--white); }
-        .btn-blue:hover { background: #001938; transform: translateY(-1px); }
-        .btn-red { background: var(--accent-red); color: var(--white); width: 100%; font-size: 1.1rem; letter-spacing: 1px; }
-        .btn-red:hover { background: #b3000d; box-shadow: 0 8px 20px rgba(230, 0, 18, 0.2); }
-        .edit-btn { background: #ffc107; border: none; padding: 6px 14px; border-radius: 4px; cursor: pointer; font-weight: 600; color: #1e293b; }
-        .edit-btn:hover { background: #e0a800; }
-
-        footer { text-align: center; padding: 60px 0; background: #0f172a; color: #94a3b8; font-size: 0.95rem; border-top: 4px solid var(--primary-blue); }
-        footer p { opacity: 0.8; }
-
-        /* 반응형 모바일 대응 */
-        @media (max-width: 968px) {
-            .grid, .business-grid, .company-grid { grid-template-columns: 1fr; }
-            .tech-detail { gap: 40px; }
-            .tech-img, .business-info, .business-img, .company-text, .company-img { min-width: 100%; }
-        }
-        @media (max-width: 768px) {
-            nav { padding: 15px 25px; }
-            .nav-links { display: none; }
-            .solutions, .board-section, .contact-section, .company-intro, .business-sales { padding: 90px 0; }
-            .contact-form { padding: 35px 20px; }
-            td, th { padding: 12px 8px; font-size: 0.85rem; }
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Physical AI | From Data to Action</title>
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-
-    <!-- 상단 내비게이션 -->
+  <header class="site-header">
+    <a href="#home" class="logo">PHYSICAL AI</a>
     <nav>
-        <div class="logo">RYU-TECH</div>
-        <ul class="nav-links">
-            <li><a href="#home">Home</a></li>
-            <li><a href="#company">Company</a></li>
-            <li><a href="#solutions">Solutions</a></li>
-            <li><a href="#business">Business</a></li>
-            <li><a href="#board">Board</a></li>
-            <li><a href="#contact">Contact</a></li>
-        </ul>
+      <a href="#home" class="nav-link">Home</a>
+      <a href="#technology" class="nav-link">Technology</a>
+      <a href="#projects" class="nav-link">Projects</a>
+      <a href="#simulator" class="nav-link">Simulator</a>
+      <a href="#feedback" class="nav-link">Feedback</a>
     </nav>
+  </header>
 
-    <!-- ① 히어로 비주얼 영역 -->
-    <header id="home" class="hero">
-        <div class="hero-content">
-            <h1>OVERCOMING LIMITS BY SOFTWARE</h1>
-            <p>RYU-TECH은 제어 대상 하드웨어가 가진 물리적 인프라의 한계를 다축 임베디드 코어 알고리즘과 신경망 레이어 분석을 통해 유연하게 극복해 냅니다.</p>
+  <main>
+    <section id="home" class="hero section-panel">
+      <div class="hero-text reveal">
+        <p class="eyebrow">Physical AI Portfolio</p>
+        <h1>From Data<br class="pc-break" /> to Action</h1>
+        <p class="korean-title">데이터에서 행동으로</p>
+        <p class="lead">AI는 이제 단순히 데이터를 분석하는 단계를 넘어, 현실 세계를 인식하고 판단하며 로봇과 기계를 제어하는 단계로 발전하고 있습니다.</p>
+        <div class="hero-actions">
+          <a href="#technology" class="btn primary">기술 흐름 보기</a>
+          <a href="#simulator" class="btn ghost">로봇 암 조작하기</a>
         </div>
-    </header>
-
-    <!-- 기업 개요 소개 구역 (COMPANY - 신규 사옥 이미지 연동 완벽 반영) -->
-    <section id="company" class="company-intro">
-        <div class="container">
-            <div class="company-grid">
-                <div class="company-text">
-                    <h2 class="section-title" style="text-align: left; margin-bottom: 25px;">About RYU-TECH</h2>
-                    <p style="font-size: 1.15rem; color: var(--dark-text); font-weight: 500; margin-bottom: 20px;">류텍(RYU-TECH)은 인공지능(AI)과 로봇 자율성 시스템 융합 프레임워크를 공급하는 대한민국 로봇 소프트웨어의 기술 표준 아키텍처 기업입니다.</p>
-                    <p style="font-size: 1rem; text-align: justify; color: var(--body-text);">우리는 불완전한 하드웨어 바디를 유연하게 제어하는 고정밀 임베디드 라이브러리를 연구 및 양산하고 있습니다. 반도체 메카트로닉스 공정 라인의 최적 가감속 펌웨어 설계부터 인간 중심의 자율 협동 운영체제(OS)까지, 무너져가는 산업 인프라를 지탱하는 디지털 신경망 기술 솔루션을 전 세계 파트너사에 공급합니다.</p>
-                </div>
-                <!-- 📸 가져오신 초고화질 사옥 전경 이미지 연동 완료 -->
-                <div class="company-img">
-                    <img src="image_59a7ac.png" alt="RYU-TECH Tech Center Headquarters">
-                </div>
-            </div>
-            
-            <div class="metric-grid">
-                <div class="metric-card">
-                    <h4>0.1 ms</h4>
-                    <p>고속 임베디드 피드백 제어 주기</p>
-                </div>
-                <div class="metric-card">
-                    <h4>99.8%</h4>
-                    <p>센서 외란 노이즈 필터링 신뢰도</p>
-                </div>
-                <div class="metric-card">
-                    <h4>45+</h4>
-                    <p>국내외 반도체 및 물류 협력 기업</p>
-                </div>
-            </div>
-        </div>
+      </div>
+      <div class="hero-visual reveal">
+        <img src="images/hero_black_robot.gif" alt="피지컬 AI 휴머노이드 로봇 애니메이션" />
+      </div>
     </section>
 
-    <!-- ② 전문 솔루션 아티클 섹션 -->
-    <section id="solutions" class="solutions">
-        <div class="container">
-            <h2 class="section-title">AI & Robotics Convergence</h2>
-            <p class="section-subtitle">인간의 물리적·인지적 임계 한계를 완전히 확장하는 류텍의 핵심 지능형 모듈</p>
-            
-            <div class="grid">
-                <!-- 솔루션 1: 물리적 한계 극복 및 초정밀화 -->
-                <div class="card">
-                    <div class="card-img" style="background-image: url('31590_205728_5732.jpg');"></div>
-                    <div class="card-body">
-                        <h3>물리적 한계 극복 및 초정밀 제어</h3>
-                        <p>반도체, 디스플레이, 바이오 공정 등 나노(nm) 단위 정밀 영역에서 기구 거동 시 발생하는 미세 관성 오차와 충격(Stuttering)을 해결합니다. 인간의 미세한 손떨림이나 단순 물리 기어 구조만으로는 제어하기 힘든 백래시(Backlash) 문제를 수 밀리초(ms) 단위의 피드백 루프 알고리즘과 PID 제어 기술 융합으로 상쇄하여 수율을 극대화합니다.</p>
-                    </div>
-                </div>
-                <!-- 솔루션 2: 인지적 한계 확장 및 센서 노이즈 필터링 -->
-                <div class="card">
-                    <div class="card-img" style="background-image: url('31590_205730_5733.jpg');"></div>
-                    <div class="card-body">
-                        <h3>인지적 한계 확장 및 센서 노이즈 필터링</h3>
-                        <p>복잡한 물류 창고나 고속 가동 라인 단에서 주변 환경의 간섭으로 인해 발생하는 무작위 데이터 노이즈를 제어합니다. 임베디드 소프트웨어 기반의 수학적 필터링과 소프트웨어적 디바운싱(Debouncing) 알고리즘을 적용해 수만 개의 신호 속에서 유의미한 정보만을 추출하고 딜레이를 최적화하여 자율형 제어를 완성합니다.</p>
-                    </div>
-                </div>
-            </div>
-        </div>
+    <section class="section-panel intro-section reveal">
+      <p class="eyebrow">Core Concept</p>
+      <h2>데이터 분석을 넘어,<br />물리적 세계를 조작하다.</h2>
+      <p class="section-lead">피지컬 AI는 단순히 데이터 분석에 그치는 것이 아니라, 물리적 환경에서 직접적인 개입과 조작이 가능한 인공지능입니다. 컴퓨터 비전, 머신러닝, 로봇 공학이 하나의 흐름으로 연결되어 현실 세계에 실제 행동을 만들어냅니다.</p>
+      <div class="concept-visual-grid">
+        <figure class="concept-diagram-card reveal">
+          <img src="images/perception_cognition_action.png" alt="Perception, Cognition, Action이 순환하는 피지컬 AI 개념도" loading="lazy" />
+          <figcaption>Perception → Cognition → Action 순환 구조</figcaption>
+        </figure>
+        <article class="concept-summary-card reveal">
+          <span class="mini-label">Physical Loop</span>
+          <h3>인식하고, 판단하고, 행동하는 AI</h3>
+          <p>센서와 카메라가 현실 데이터를 수집하고, AI 모델이 상황을 판단한 뒤, 로봇 암이나 모터가 실제 움직임으로 결과를 만들어냅니다.</p>
+        </article>
+      </div>
+      <div class="value-grid">
+        <article>
+          <span>01</span>
+          <h3>Perception</h3>
+          <p>카메라와 센서를 통해 객체, 공간, 사람의 움직임을 인식합니다.</p>
+        </article>
+        <article>
+          <span>02</span>
+          <h3>Decision</h3>
+          <p>머신러닝 모델이 수집된 데이터를 바탕으로 최적의 행동을 판단합니다.</p>
+        </article>
+        <article>
+          <span>03</span>
+          <h3>Action</h3>
+          <p>로봇 암과 모터를 제어하여 집기, 이동, 분류 같은 물리 작업을 수행합니다.</p>
+        </article>
+      </div>
     </section>
 
-    <!-- 비즈니스 제품 판매 및 B2B 마켓 솔루션 안내 공급 영역 (BUSINESS - 토니 스타크 짤 연동 완벽 반영) -->
-    <section id="business" class="business-sales">
-        <div class="container">
-            <div class="business-grid">
-                <div class="business-info">
-                    <h3>RYU-TECH Core Technology Supply</h3>
-                    <p>류텍은 글로벌 엔지니어링 기업 및 제조 공장을 대상으로 자체 개발한 독점 지능형 커널 소프트웨어 패키지와 고성능 다축 임베디드 제어 로봇 키트를 B2B 형태로 양산·판매하고 있습니다.</p>
-                    
-                    <div class="product-list">
-                        <div class="product-item">
-                            <h4>1. RT-Kernel AI Vision v4.2 (소프트웨어 커널 라이스선스 공급)</h4>
-                            <p>실시간 LiDAR 포인트 클라우드 매핑 및 시각 데이터 분산 연산 처리용 딥러닝 임베디드 코어 모듈입니다.</p>
-                        </div>
-                        <div class="product-item">
-                            <h4>2. High-Torque Multi-Axis Actuator Kit (지능형 임베디드 구동기 판매)</h4>
-                            <p>물리적 마찰 저항과 백래시 오차를 자가 보정 알고리즘 인터페이스로 상쇄하는 스마트 구동 부품 유닛입니다.</p>
-                        </div>
-                    </div>
-                </div>
-                <!-- 📸 가져오신 하드웨어 융합 시스템 아키텍처 비주얼 연동 완료 -->
-                <div class="business-img">
-                    <img src="image_59ab0b.jpg" alt="RYU-TECH Robotics Integration Research Studio">
-                </div>
-            </div>
+    <section id="technology" class="section-panel split-section">
+      <div class="reveal">
+        <p class="eyebrow">Technology Fusion</p>
+        <h2>Vision → ML → Robotics</h2>
+        <p class="section-lead">피지컬 AI는 화면 속 결과를 보여주는 기술이 아니라, 인식한 정보를 실제 하드웨어 제어까지 연결하는 기술입니다.</p>
+      </div>
+      <div class="flow reveal">
+        <div class="flow-card">
+          <b>Computer Vision</b>
+          <span>카메라가 물리적 세계의 데이터를 받아오고 객체와 위치를 인식합니다.</span>
         </div>
+        <div class="arrow">→</div>
+        <div class="flow-card">
+          <b>Machine Learning</b>
+          <span>인식된 데이터를 기반으로 어떤 움직임을 취해야 할지 학습하고 판단합니다.</span>
+        </div>
+        <div class="arrow">→</div>
+        <div class="flow-card">
+          <b>Robotics</b>
+          <span>판단된 결과를 로봇 암의 관절, 모터, 그리퍼 제어로 변환합니다.</span>
+        </div>
+      </div>
     </section>
 
-    <!-- ③ 기술 상세 설명 및 엔지니어링 철학 고찰 -->
-    <section class="container tech-detail">
-        <div class="tech-img"><img src="로봇 움직임.gif" alt="RYU-TECH Humanoid Motion Engine"></div>
-        <div class="tech-info">
-            <h2>Modern Robotics Paradigm Shift</h2>
-            <p>과거의 로봇 공학 기술이 거대한 안전 철제 펜스 내에 기계를 격리해 두고 정해진 좌표(G-code) 시퀀스만을 무한 반복 수행하게 하던 무지한 자동화에 그쳤다면, 현시대의 로봇 공학은 경계를 허물고 인간과 같은 공간에서 호흡하는 자율 협동 기술로 나아갑니다.</p>
-            <p>아무리 정밀하게 설계를 고도화하고 재료를 가공해도, 공기 저항이나 배선의 전류 미세 변화 등 물리적 외란 요소를 하드웨어 혼자 힘으로 완벽하게 제어할 수는 없습니다.</p>
-            <div class="highlight-box">
-                "하드웨어라는 견고하고 제한적인 물리적 뼈대 위에, 소프트웨어라는 유연하고 연속적인 신경망 알고리즘을 심어 숨을 불어넣는 아키텍처 시스템 설계야말로 진정한 현대 로봇소프트웨어 공학의 정체성이자 종착지입니다."
-            </div>
-        </div>
+    <section class="image-story section-panel">
+      <img src="images/robot-arm.png" alt="산업용 로봇 암" class="reveal" />
+      <div class="reveal">
+        <p class="eyebrow">Current Status</p>
+        <h2>현재의 피지컬 AI</h2>
+        <p class="section-lead">피지컬 AI는 제조 자동화, 물류 분류, 품질 검사, 서비스 로봇 분야에서 빠르게 확산되고 있습니다. 특히 로봇 암 시스템은 카메라로 대상을 인식하고, 알고리즘으로 움직임을 계산한 뒤, 관절과 그리퍼를 제어해 실제 작업을 수행합니다.</p>
+      </div>
     </section>
 
-    <!-- ④ 기술 지원 실시간 파이어베이스 게시판 -->
-    <section id="board" class="board-section">
-        <div class="container">
-            <h2>📋 Real-time Engine Support Board</h2>
-            <table>
-                <thead><tr><th>작성자</th><th>제목</th><th>날짜</th><th>관리</th></tr></thead>
-                <tbody id="board-body"><tr><td colspan="4">데이터를 동기화하는 중입니다...</td></tr></tbody>
-            </table>
-            <div class="input-group">
-                <h3 id="form-title">엔지니어링 질의 / 피드백 수렴</h3>
-                <input type="hidden" id="post-id"> 
-                <input type="text" id="author" placeholder="작성자 성함 및 소속 기관">
-                <input type="text" id="title" placeholder="기술 피드백 및 시스템 디버깅 요약 내용">
-                <button class="btn btn-blue" id="submit-btn">실시간 동기화 및 저장</button>
-            </div>
-        </div>
+    <section id="projects" class="section-panel projects-section reveal">
+      <p class="eyebrow">Projects Portfolio</p>
+      <h2>로봇 제어 포트폴리오</h2>
+      <p class="section-lead">프로젝트 설명은 복잡한 형식보다, 피지컬 AI의 핵심인 인식·판단·행동 흐름이 드러나도록 구성했습니다.</p>
+      <div class="project-grid">
+        <article class="project-card">
+          <img src="images/xyz_robot_control.png" alt="좌표축 기반 로봇 제어 예시" class="project-image" />
+          <h3>Vision Based Robot Arm</h3>
+          <p>카메라로 물체의 위치를 인식하고 로봇 암의 관절 각도를 계산해 대상물을 집고 이동하는 조작 시스템입니다.</p>
+          <ul>
+            <li>OpenCV 기반 객체 인식</li>
+            <li>KNN 분류 알고리즘 적용</li>
+            <li>X·Y·Z 좌표 기반 엔드이펙터 제어</li>
+          </ul>
+        </article>
+        <article class="project-card">
+          <img src="images/motion_tracking.png" alt="사람 관절 좌표 추적 예시" class="project-image" />
+          <h3>Human Motion Imitation</h3>
+          <p>사람의 팔과 몸의 움직임을 추적해 로봇 암이 유사한 동작을 수행하도록 설계한 모방 제어 프로젝트입니다.</p>
+          <ul>
+            <li>관절 좌표 추적</li>
+            <li>움직임 데이터 정규화</li>
+            <li>로봇 관절 매핑</li>
+          </ul>
+        </article>
+        <article class="project-card">
+          <img src="images/warehouse.png" alt="스마트 물류 로봇 작업 예시" class="project-image" />
+          <h3>Smart Sorting System</h3>
+          <p>물류 환경에서 물체를 인식하고 종류별로 자동 분류하는 피지컬 AI 기반 자동화 시스템입니다.</p>
+          <ul>
+            <li>물체 색상 및 형태 분석</li>
+            <li>분류 결과 기반 이동 경로 제어</li>
+            <li>작업 성공률과 처리 속도 시각화</li>
+          </ul>
+        </article>
+      </div>
     </section>
 
-    <!-- ⑤ 1:1 최고기술책임자 직접 이메일 핫라인 -->
-    <section id="contact" class="contact-section">
-        <div class="container">
-            <h2 class="section-title">Direct Contact To CEO</h2>
-            <div class="contact-form">
-                <form action="https://formsubmit.co/jerryryu0902@dongyang.ac.kr" method="POST">
-                    <input type="hidden" name="_captcha" value="false">
-                    <input type="text" name="name" placeholder="의뢰인 성함 / 파트너 기업명" required>
-                    <input type="email" name="email" placeholder="회신받으실 비즈니스 메일 주소" required>
-                    <textarea name="message" rows="5" placeholder="인구 생산성 절벽 위기에 대응하기 위한 시스템 연동 규격 및 소프트웨어 요구사항 아키텍처를 자유롭게 기재해 주세요." required></textarea>
-                    <button type="submit" class="btn btn-red">이메일 기술 문의 요청 (보안 암호화 발송)</button>
-                </form>
-            </div>
+    <section id="simulator" class="section-panel simulator-section reveal">
+      <p class="eyebrow">Interactive Simulator</p>
+      <h2>마우스를 따라 움직이는 X·Y·Z 로봇 암 시뮬레이터</h2>
+      <p class="section-lead">시뮬레이터 화면 위에서 마우스를 움직이면 목표 지점이 변하고, 로봇 암이 해당 위치를 따라갑니다. 오른쪽 패널에서 X·Y·Z 좌표값이 실시간으로 바뀌는 것을 확인할 수 있습니다.</p>
+      <div class="simulator-wrap mouse-simulator">
+        <div class="robot-sim canvas-sim">
+          <canvas id="robotCanvas" width="720" height="460" tabindex="0" aria-label="마우스 위치를 따라 움직이는 3D 로봇 암 시뮬레이터"></canvas>
+          <div class="axis-note">Move mouse · X/Y/Z Workspace</div>
         </div>
+        <div class="controls mouse-panel">
+          <div class="mouse-guide">
+            <span class="guide-icon">↗</span>
+            <div>
+              <strong>마우스를 움직여 목표 좌표를 바꿔보세요.</strong>
+              <p>가로 이동은 X 좌표, 세로 이동은 Y 깊이와 Z 높이 변화로 변환됩니다. 캔버스에 포커스를 둔 뒤 방향키로도 조작할 수 있습니다.</p>
+            </div>
+          </div>
+          <div class="coord-grid" aria-label="현재 로봇 암 목표 좌표">
+            <div><span>X</span><b id="xValue">145</b></div>
+            <div><span>Y</span><b id="yValue">55</b></div>
+            <div><span>Z</span><b id="zValue">80</b></div>
+          </div>
+          <p class="coord-readout" id="coordReadout">End Effector : X 145 · Y 55 · Z 80</p>
+          <button id="resetBtn" type="button">Reset Position</button>
+        </div>
+      </div>
     </section>
 
-    <!-- 푸터 -->
-    <footer>
-        <div style="max-width: 1200px; margin: 0 auto; padding: 0 20px;">
-            <p style="font-weight:700; margin-bottom: 10px; color:#fff;">RYU-TECH EMBEDDED SYSTEM ARCHITECTURE LAB</p>
-            <p>&copy; 2026 RYU-TECH. 인류의 한계를 확장하는 소프트웨어 지능 가치 구현. All rights reserved.</p>
+    <section class="section-panel future-section reveal">
+      <p class="eyebrow">Future Vision</p>
+      <h2>피지컬 AI의 전망</h2>
+      <div class="future-grid">
+        <div><b>Smart Factory</b><span>AI가 생산 공정을 실시간으로 판단하고 로봇이 직접 조립·검사합니다.</span></div>
+        <div><b>Autonomous Logistics</b><span>물류센터에서 피킹, 분류, 운반 작업이 자동화됩니다.</span></div>
+        <div><b>Healthcare Robot</b><span>의료·재활 영역에서 사람의 움직임을 보조합니다.</span></div>
+        <div><b>Home Robot</b><span>가정에서도 사람과 협업하는 로봇 서비스가 확대됩니다.</span></div>
+      </div>
+    </section>
+
+    <section id="feedback" class="section-panel feedback-section reveal">
+      <p class="eyebrow">Q&A Board + Gmail</p>
+      <h2>Q&A 게시판과 Gmail 문의</h2>
+      <p class="section-lead">게시판과 이메일 문의를 분리했습니다. Q&A 게시판은 Firebase Realtime Database에 실시간으로 저장되고, 작성 시 입력한 비밀번호로 본인 글을 삭제할 수 있습니다. Gmail 문의는 작성 내용을 학교 이메일로 보낼 수 있도록 Gmail 작성창을 엽니다.</p>
+
+      <div class="feedback-layout">
+        <article class="feedback-card board-card">
+          <p class="mini-label">Realtime Q&A</p>
+          <h3>Q&A 게시판</h3>
+          <p class="card-desc">질문과 의견을 남기면 아래 게시판 내역에 바로 표시됩니다. 삭제할 때는 글 작성 시 입력한 비밀번호가 필요합니다.</p>
+          <form id="boardForm" class="feedback-form">
+            <div class="form-row">
+              <input id="boardNameInput" type="text" placeholder="이름" required aria-label="게시판 작성자 이름" />
+              <input id="boardPasswordInput" type="password" placeholder="삭제용 비밀번호" required aria-label="게시글 삭제용 비밀번호" />
+            </div>
+            <input id="boardTitleInput" type="text" placeholder="제목" required aria-label="게시글 제목" />
+            <textarea id="boardMessageInput" placeholder="피지컬 AI 홈페이지에 대한 질문이나 의견을 남겨주세요" required aria-label="게시글 내용"></textarea>
+            <button type="submit">Q&A 게시판에 등록하기</button>
+          </form>
+          <p id="boardStatus" class="status-text" role="status"></p>
+        </article>
+
+        <article class="feedback-card mail-card">
+          <p class="mini-label">Gmail Contact</p>
+          <h3>Gmail 문의 발송</h3>
+          <p class="card-desc">게시판과 별도로 문의 내용을 Gmail 작성창에 자동 입력합니다. 받는 메일은 <b>jerryryu0902@dongyang.ac.kr</b>입니다.</p>
+          <form id="gmailForm" class="feedback-form">
+            <div class="form-row">
+              <input id="mailNameInput" type="text" placeholder="이름" required aria-label="메일 보내는 사람 이름" />
+              <input id="mailEmailInput" type="email" placeholder="답장 받을 이메일 선택 입력" aria-label="답장 받을 이메일" />
+            </div>
+            <input id="mailSubjectInput" type="text" placeholder="메일 제목" value="Physical AI 홈페이지 문의" required aria-label="메일 제목" />
+            <textarea id="mailMessageInput" placeholder="Gmail로 보낼 문의 내용을 작성해주세요" required aria-label="메일 내용"></textarea>
+            <button type="submit" class="mail-button">Gmail 작성창 열기</button>
+          </form>
+          <p id="mailStatus" class="status-text" role="status"></p>
+        </article>
+      </div>
+
+      <div class="board-history">
+        <div class="history-heading">
+          <div>
+            <p class="mini-label">Board History</p>
+            <h3>게시판 내역</h3>
+          </div>
+          <p>최근 등록된 Q&A를 실시간으로 확인할 수 있습니다.</p>
         </div>
-    </footer>
+        <div id="feedbackList" class="feedback-list" aria-live="polite"></div>
+      </div>
+    </section>
+  </main>
 
-    <!-- 파이어베이스 실시간 백엔드 연결 코어 스크립트 모듈 -->
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-app.js";
-        import { getDatabase, ref, push, onValue, update } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-database.js";
+  <footer>
+    <p>Physical AI Portfolio Website · Dongyang Mirae University</p>
+  </footer>
 
-        const firebaseConfig = {
-            apiKey: "AIzaSyC0GtGE5tQQpikwfxT2TCp3DCoLtn_vhMY",
-            authDomain: "myweb-6bc43.firebaseapp.com",
-            projectId: "myweb-6bc43",
-            databaseURL: "https://myweb-6bc43-default-rtdb.firebaseio.com"
-        };
-
-        const app = initializeApp(firebaseConfig);
-        const db = getDatabase(app);
-        const postsRef = ref(db, 'posts');
-
-        document.getElementById('submit-btn').onclick = function() {
-            const id = document.getElementById('post-id').value;
-            const author = document.getElementById('author').value.trim();
-            const title = document.getElementById('title').value.trim();
-            const date = new Date().toLocaleDateString();
-
-            if(!author || !title) return alert("데이터 입력 필드가 비어 있습니다.");
-
-            if(id) {
-                update(ref(db, 'posts/'+id), { author, title, date }).then(()=>alert("성공적으로 데이터가 수정 동기화되었습니다."));
-            } else {
-                push(postsRef, { author, title, date });
-            }
-            document.getElementById('post-id').value=""; document.getElementById('author').value=""; document.getElementById('title').value="";
-            document.getElementById('form-title').innerText = "게시글 작성/수정";
-        };
-
-        onValue(postsRef, (snapshot) => {
-            const data = snapshot.val();
-            const tbody = document.getElementById('board-body');
-            tbody.innerHTML = "";
-            
-            if(!data) {
-                tbody.innerHTML = `<tr><td colspan="4" style="color:#94a3b8;">등록된 엔지니어링 피드백 아티클이 없습니다.</td></tr>`;
-                return;
-            }
-
-            for (let id in data) {
-                tbody.innerHTML += `<tr>
-                    <td style="font-weight:600; color:#1e293b;">${data[id].author}</td>
-                    <td style="text-align:left; padding-left:30px;">${data[id].title}</td>
-                    <td style="color:#64748b; font-size:0.85rem;">${data[id].date}</td>
-                    <td><button class="edit-btn" onclick="prepareEdit('${id}','${data[id].author}','${data[id].title}')">제어</button></td>
-                </tr>`;
-            }
-        });
-
-        window.prepareEdit = (id, author, title) => {
-            document.getElementById('post-id').value = id;
-            document.getElementById('author').value = author;
-            document.getElementById('title').value = title;
-            document.getElementById('form-title').innerText = "선택된 세션 데이터 수정 디버깅 중";
-            document.getElementById('title').focus();
-        };
-    </script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-database-compat.js"></script>
+  <script src="script.js"></script>
 </body>
 </html>
